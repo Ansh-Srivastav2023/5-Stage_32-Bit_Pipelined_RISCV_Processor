@@ -18,7 +18,7 @@ module Register (rs1, rs2, w_add, RegWrite, RegWriteData, clk, rst, data1, data2
 
     initial begin
         register[0] = 32'd0;
-        register[1] = 32'd8;
+        register[1] = 32'd10;
         register[2] = 32'd9;
         register[7] = 32'd13;
     end
