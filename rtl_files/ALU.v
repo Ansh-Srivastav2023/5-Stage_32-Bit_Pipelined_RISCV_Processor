@@ -64,7 +64,7 @@ module PC_ALU_Adder (A, B, Sum);
     output [31:0] Sum;
 
     assign Sum = A + B;
-endmodule //PC_ALU_Asser
+endmodule 
 
 
 module Multiplexer_ALUCtrl(A, B, sel, Out);
