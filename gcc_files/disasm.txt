@@ -1,0 +1,38 @@
+
+tst.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .init:
+
+00000000 <_start>:
+   0:	00001117          	auipc	sp,0x1
+   4:	00010113          	mv	sp,sp
+   8:	008000ef          	jal	ra,10 <main>
+   c:	0000006f          	j	c <_start+0xc>
+
+Disassembly of section .text:
+
+00000010 <main>:
+  10:	00018737          	lui	a4,0x18
+  14:	ff010113          	addi	sp,sp,-16 # ff0 <main+0xfe0>
+  18:	0ff00693          	li	a3,255
+  1c:	69f70713          	addi	a4,a4,1695 # 1869f <_stack_top+0x1769f>
+  20:	00d02623          	sw	a3,12(zero) # c <_start+0xc>
+  24:	00012423          	sw	zero,8(sp)
+  28:	00812783          	lw	a5,8(sp)
+  2c:	00f74c63          	blt	a4,a5,44 <main+0x34>
+  30:	00812783          	lw	a5,8(sp)
+  34:	00178793          	addi	a5,a5,1
+  38:	00f12423          	sw	a5,8(sp)
+  3c:	00812783          	lw	a5,8(sp)
+  40:	fef758e3          	bge	a4,a5,30 <main+0x20>
+  44:	00002623          	sw	zero,12(zero) # c <_start+0xc>
+  48:	00012623          	sw	zero,12(sp)
+  4c:	00c12783          	lw	a5,12(sp)
+  50:	fcf748e3          	blt	a4,a5,20 <main+0x10>
+  54:	00c12783          	lw	a5,12(sp)
+  58:	00178793          	addi	a5,a5,1
+  5c:	00f12623          	sw	a5,12(sp)
+  60:	00c12783          	lw	a5,12(sp)
+  64:	fef758e3          	bge	a4,a5,54 <main+0x44>
+  68:	fb9ff06f          	j	20 <main+0x10>

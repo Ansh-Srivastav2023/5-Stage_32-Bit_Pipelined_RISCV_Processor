@@ -6,16 +6,7 @@ module Data_Memory (clk, MemWrite, MemRead, MemWriteData, MemReadData, ALUresult
 
     output signed [31:0] MemReadData;
 
-    reg signed [31:0] mem [0:31];
-
-    initial begin
-        mem[0] = 32'd21;
-        mem[1] = 32'd50;
-        mem[2] = 32'd18;
-        mem[5] = 32'd18;
-        mem[6] = 32'd23;
-        mem[7] = 32'd100;
-    end
+    reg signed [31:0] mem [0:1023];
 
     assign MemReadData = MemRead ? mem[ALUresult[31:2]] : 'b0;
 

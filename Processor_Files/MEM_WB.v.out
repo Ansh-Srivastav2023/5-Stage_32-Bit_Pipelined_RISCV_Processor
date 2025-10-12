@@ -1,0 +1,148 @@
+#! /usr/bin/vvp
+:ivl_version "11.0 (stable)";
+:ivl_delay_selection "TYPICAL";
+:vpi_time_precision + 0;
+:vpi_module "/usr/lib/x86_64-linux-gnu/ivl/system.vpi";
+:vpi_module "/usr/lib/x86_64-linux-gnu/ivl/vhdl_sys.vpi";
+:vpi_module "/usr/lib/x86_64-linux-gnu/ivl/vhdl_textio.vpi";
+:vpi_module "/usr/lib/x86_64-linux-gnu/ivl/v2005_math.vpi";
+:vpi_module "/usr/lib/x86_64-linux-gnu/ivl/va_math.vpi";
+S_0x6322999eff90 .scope module, "MEM_WB" "MEM_WB" 2 1;
+ .timescale 0 0;
+    .port_info 0 /INPUT 1 "RegWrite";
+    .port_info 1 /INPUT 32 "MemReadData";
+    .port_info 2 /INPUT 32 "ALUresult";
+    .port_info 3 /INPUT 5 "rd_EXMEM";
+    .port_info 4 /INPUT 1 "clk";
+    .port_info 5 /INPUT 1 "rst";
+    .port_info 6 /INPUT 2 "ResultSrc";
+    .port_info 7 /INPUT 32 "PC";
+    .port_info 8 /OUTPUT 32 "PC_MEM";
+    .port_info 9 /OUTPUT 2 "ResultSrc_MEM";
+    .port_info 10 /OUTPUT 1 "RegWrite_MEM";
+    .port_info 11 /OUTPUT 32 "MemReadData_MEM";
+    .port_info 12 /OUTPUT 32 "ALUresult_MEM";
+    .port_info 13 /OUTPUT 5 "rd_EXMEM_MEM";
+    .port_info 14 /INPUT 32 "PC_next_EX";
+    .port_info 15 /OUTPUT 32 "PC_next_MEM";
+o0x714c24c78018 .functor BUFZ 32, C4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; HiZ drive
+v0x6322999b2f40_0 .net "ALUresult", 31 0, o0x714c24c78018;  0 drivers
+v0x632299a045a0_0 .var "ALUresult_MEM", 31 0;
+o0x714c24c78078 .functor BUFZ 32, C4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; HiZ drive
+v0x632299a04680_0 .net "MemReadData", 31 0, o0x714c24c78078;  0 drivers
+v0x632299a04740_0 .var "MemReadData_MEM", 31 0;
+o0x714c24c780d8 .functor BUFZ 32, C4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; HiZ drive
+v0x632299a04820_0 .net "PC", 31 0, o0x714c24c780d8;  0 drivers
+v0x632299a04950_0 .var "PC_MEM", 31 0;
+o0x714c24c78138 .functor BUFZ 32, C4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; HiZ drive
+v0x632299a04a30_0 .net "PC_next_EX", 31 0, o0x714c24c78138;  0 drivers
+v0x632299a04b10_0 .var "PC_next_MEM", 31 0;
+o0x714c24c78198 .functor BUFZ 1, C4<z>; HiZ drive
+v0x632299a04bf0_0 .net "RegWrite", 0 0, o0x714c24c78198;  0 drivers
+v0x632299a04d40_0 .var "RegWrite_MEM", 0 0;
+o0x714c24c781f8 .functor BUFZ 2, C4<zz>; HiZ drive
+v0x632299a04e00_0 .net "ResultSrc", 1 0, o0x714c24c781f8;  0 drivers
+v0x632299a04ee0_0 .var "ResultSrc_MEM", 1 0;
+o0x714c24c78258 .functor BUFZ 1, C4<z>; HiZ drive
+v0x632299a04fc0_0 .net "clk", 0 0, o0x714c24c78258;  0 drivers
+o0x714c24c78288 .functor BUFZ 5, C4<zzzzz>; HiZ drive
+v0x632299a05080_0 .net "rd_EXMEM", 4 0, o0x714c24c78288;  0 drivers
+v0x632299a05160_0 .var "rd_EXMEM_MEM", 4 0;
+o0x714c24c782e8 .functor BUFZ 1, C4<z>; HiZ drive
+v0x632299a05240_0 .net "rst", 0 0, o0x714c24c782e8;  0 drivers
+E_0x6322999ec350/0 .event negedge, v0x632299a05240_0;
+E_0x6322999ec350/1 .event posedge, v0x632299a04fc0_0;
+E_0x6322999ec350 .event/or E_0x6322999ec350/0, E_0x6322999ec350/1;
+S_0x6322999b2cf0 .scope module, "multiplex_3x1" "multiplex_3x1" 2 23;
+ .timescale 0 0;
+    .port_info 0 /INPUT 32 "A";
+    .port_info 1 /INPUT 32 "B";
+    .port_info 2 /INPUT 32 "C";
+    .port_info 3 /INPUT 32 "D";
+    .port_info 4 /INPUT 2 "sel";
+    .port_info 5 /OUTPUT 32 "Result";
+o0x714c24c78618 .functor BUFZ 32, C4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; HiZ drive
+v0x632299a05590_0 .net "A", 31 0, o0x714c24c78618;  0 drivers
+o0x714c24c78648 .functor BUFZ 32, C4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; HiZ drive
+v0x632299a05690_0 .net "B", 31 0, o0x714c24c78648;  0 drivers
+o0x714c24c78678 .functor BUFZ 32, C4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; HiZ drive
+v0x632299a05770_0 .net "C", 31 0, o0x714c24c78678;  0 drivers
+o0x714c24c786a8 .functor BUFZ 32, C4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; HiZ drive
+v0x632299a05830_0 .net "D", 31 0, o0x714c24c786a8;  0 drivers
+v0x632299a05910_0 .net "Result", 31 0, L_0x632299a06880;  1 drivers
+L_0x714c24c2f018 .functor BUFT 1, C4<00>, C4<0>, C4<0>, C4<0>;
+v0x632299a059f0_0 .net/2u *"_ivl_0", 1 0, L_0x714c24c2f018;  1 drivers
+v0x632299a05ad0_0 .net *"_ivl_10", 0 0, L_0x632299a064a0;  1 drivers
+v0x632299a05b90_0 .net *"_ivl_12", 31 0, L_0x632299a065c0;  1 drivers
+v0x632299a05c70_0 .net *"_ivl_14", 31 0, L_0x632299a06710;  1 drivers
+v0x632299a05d50_0 .net *"_ivl_2", 0 0, L_0x632299a06230;  1 drivers
+L_0x714c24c2f060 .functor BUFT 1, C4<01>, C4<0>, C4<0>, C4<0>;
+v0x632299a05e10_0 .net/2u *"_ivl_4", 1 0, L_0x714c24c2f060;  1 drivers
+v0x632299a05ef0_0 .net *"_ivl_6", 0 0, L_0x632299a06330;  1 drivers
+L_0x714c24c2f0a8 .functor BUFT 1, C4<10>, C4<0>, C4<0>, C4<0>;
+v0x632299a05fb0_0 .net/2u *"_ivl_8", 1 0, L_0x714c24c2f0a8;  1 drivers
+o0x714c24c78888 .functor BUFZ 2, C4<zz>; HiZ drive
+v0x632299a06090_0 .net "sel", 1 0, o0x714c24c78888;  0 drivers
+L_0x632299a06230 .cmp/eq 2, o0x714c24c78888, L_0x714c24c2f018;
+L_0x632299a06330 .cmp/eq 2, o0x714c24c78888, L_0x714c24c2f060;
+L_0x632299a064a0 .cmp/eq 2, o0x714c24c78888, L_0x714c24c2f0a8;
+L_0x632299a065c0 .functor MUXZ 32, o0x714c24c786a8, o0x714c24c78678, L_0x632299a064a0, C4<>;
+L_0x632299a06710 .functor MUXZ 32, L_0x632299a065c0, o0x714c24c78648, L_0x632299a06330, C4<>;
+L_0x632299a06880 .functor MUXZ 32, L_0x632299a06710, o0x714c24c78618, L_0x632299a06230, C4<>;
+    .scope S_0x6322999eff90;
+T_0 ;
+    %wait E_0x6322999ec350;
+    %load/vec4 v0x632299a05240_0;
+    %inv;
+    %flag_set/vec4 8;
+    %jmp/0xz  T_0.0, 8;
+    %pushi/vec4 0, 0, 136;
+    %split/vec4 5;
+    %assign/vec4 v0x632299a05160_0, 0;
+    %split/vec4 32;
+    %assign/vec4 v0x632299a045a0_0, 0;
+    %split/vec4 32;
+    %assign/vec4 v0x632299a04740_0, 0;
+    %split/vec4 1;
+    %assign/vec4 v0x632299a04d40_0, 0;
+    %split/vec4 2;
+    %assign/vec4 v0x632299a04ee0_0, 0;
+    %split/vec4 32;
+    %assign/vec4 v0x632299a04950_0, 0;
+    %assign/vec4 v0x632299a04b10_0, 0;
+    %jmp T_0.1;
+T_0.0 ;
+    %load/vec4 v0x632299a04a30_0;
+    %load/vec4 v0x632299a04820_0;
+    %concat/vec4; draw_concat_vec4
+    %load/vec4 v0x632299a04e00_0;
+    %concat/vec4; draw_concat_vec4
+    %load/vec4 v0x632299a04bf0_0;
+    %concat/vec4; draw_concat_vec4
+    %load/vec4 v0x632299a04680_0;
+    %concat/vec4; draw_concat_vec4
+    %load/vec4 v0x6322999b2f40_0;
+    %concat/vec4; draw_concat_vec4
+    %load/vec4 v0x632299a05080_0;
+    %concat/vec4; draw_concat_vec4
+    %split/vec4 5;
+    %assign/vec4 v0x632299a05160_0, 0;
+    %split/vec4 32;
+    %assign/vec4 v0x632299a045a0_0, 0;
+    %split/vec4 32;
+    %assign/vec4 v0x632299a04740_0, 0;
+    %split/vec4 1;
+    %assign/vec4 v0x632299a04d40_0, 0;
+    %split/vec4 2;
+    %assign/vec4 v0x632299a04ee0_0, 0;
+    %split/vec4 32;
+    %assign/vec4 v0x632299a04950_0, 0;
+    %assign/vec4 v0x632299a04b10_0, 0;
+T_0.1 ;
+    %jmp T_0;
+    .thread T_0;
+# The file index is used to find the file name in the following table.
+:file_names 3;
+    "N/A";
+    "<interactive>";
+    "MEM_WB.v";

@@ -10,7 +10,8 @@ module Register (rs1, rs2, w_add, RegWrite, RegWriteData, clk, rst, data1, data2
 
     always @(posedge clk) begin
         if(RegWrite) 
-            register[w_add] <= RegWriteData;        
+            register[w_add] <= (w_add != 'b0) ? RegWriteData : 'b0;        
+        
     end
 
     assign data1 = ~rst ? 32'b0 : register[rs1];
@@ -18,9 +19,6 @@ module Register (rs1, rs2, w_add, RegWrite, RegWriteData, clk, rst, data1, data2
 
     initial begin
         register[0] = 32'd0;
-        register[1] = 32'd10;
-        register[2] = 32'd9;
-        register[7] = 32'd13;
     end
 endmodule //Register
 
