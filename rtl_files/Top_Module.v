@@ -27,7 +27,7 @@ module Top_Module (
     wire [31:0] PC, PC_next, PCPlus4, instruction;
     
     wire [31:0] Result, data1, data2, ImmExt, PC_ALU_Sum, initial_instr, compress_instr, data1_ID_ForwA, rdB_ForwB, rf_data1, rf_data2;
-    wire RegWrite, JumpReg, Jump, Branch, PCSrc, ALUSrc, Zero, MemWrite, MemRead, Zero_branch, ALUSrc_ID, PCWriteEN, IF_ID_WriteEN, NOP, B_Zero, B_Zero_ID, Branch_ID, Jump_ID, JumpReg_ID, Flush;
+    wire RegWrite, JumpReg, Jump, Branch, PCSrc, ALUSrc, Zero, MemWrite, MemRead, ALUSrc_ID, PCWriteEN, IF_ID_WriteEN, NOP, B_Zero, B_Zero_ID, Branch_ID, Jump_ID, JumpReg_ID, Flush;
     wire [31:0] rdA, rdB, ALUresult,PC_Branch;
     
     wire [2:0] ImmType, ImmType_ID;
@@ -102,7 +102,6 @@ module Top_Module (
         .opcode(instruction_IF[6:0]),
         .funct3(instruction_IF[14:12]),
         .funct7(instruction_IF[31:25]),
-        .Zero(Zero_branch),
         .RegWrite(RegWrite),
         .MemWrite(MemWrite),
         .MemRead(MemRead),
