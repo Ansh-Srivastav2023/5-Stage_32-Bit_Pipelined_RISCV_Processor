@@ -104,7 +104,7 @@ This command will:
 
 ### 🧹 Step 4: Clean Up
 
-To remove all generated files (object files, executables, hex files, and simulation outputs), use the clean target.
+To remove all generated files (object files, executables, hex files, and simulation outputs), use the clean target. Also, in case if running `make` gives an error like `nothing to make`, run the following command: -
 
 ```bash
 make clean
