@@ -1,27 +1,12 @@
-<<<<<<< HEAD
-# 5-Stage Pipelined RISC-V Core
-## 1. Overview
-This project is a complete implementation of a 32-bit RISC-V processor written in Verilog. It features a classic 5-stage pipeline architecture (Fetch, Decode, Execute, Memory, Write-Back) designed to execute a subset of the RISC-V instruction set. The core is capable of running C code compiled using a standard RISC-V GCC toolchain.
-=======
 # 🚀 5-Stage Pipelined RISC-V Core
->>>>>>> b5349666734042f32b51610da77dd367575ee22b
 
 ## 📋 1. Overview
 
-<<<<<<< HEAD
-## 2. Core Features
-The processor implements the following architectural features:
-
-**ISA Support: RV32IMC**
-
-**I**: Base Integer Instruction Set
-=======
 🎯 This project is a complete implementation of a 32-bit RISC-V processor written in Verilog. It features a classic 5-stage pipeline architecture (Fetch, Decode, Execute, Memory, Write-Back) designed to execute a subset of the RISC-V instruction set. The core is capable of running C code compiled using a standard RISC-V GCC toolchain.
 
 💡 The design prioritizes correctness and clarity, with a full implementation of hazard detection and data forwarding to maximize pipeline efficiency and handle data dependencies correctly.
 
 ## ⚡ 2. Core Features
->>>>>>> b5349666734042f32b51610da77dd367575ee22b
 
 🔧 The processor implements the following architectural features:
 
@@ -53,7 +38,7 @@ The processor implements the following architectural features:
 
 ## 🛠️ 4. Toolchain & Simulation
 
-⚙️ This project uses a combination of a RISC-V GCC toolchain to generate machine code from C and `Icarus Verilog` to simulate the processor's execution.
+⚙️ This project uses a combination of a RISC-V GCC toolchain to generate machine code from C and Icarus Verilog to simulate the processor's execution.
 
 ### 📋 Prerequisites
 
@@ -65,32 +50,9 @@ The processor implements the following architectural features:
 
 🔄 The entire build and simulation process is automated using the provided Makefile.
 
-<<<<<<< HEAD
-Compressed Instruction Support: Includes a decompressor module to fully support the 'C' extension, reducing code size by 25-30%.
- 
-## 3. Architecture
-The processor follows a standard 5-stage pipeline design. Key components include the Control Unit, Register File, ALU, pipeline registers, and hazard management units.
-
-##4. Toolchain & Simulation
-This project uses a combination of a RISC-V GCC toolchain to generate machine code from C and Icarus Verilog to simulate the processor's execution.
-
-Prerequisites
-RISC-V GCC Toolchain: riscv64-unknown-elf-gcc and associated tools (objdump).
-
-Verilog Simulator: iverilog (Icarus Verilog) and vvp.
-
-Build Tool: make.
-
-## 5. How to Use
-The entire build and simulation process is automated using the provided Makefile.
-
-Step 1: Write a C Program
-Write your desired C code in the tst.c file. The program should return its final result from the main function, which will then be available in the a0 (x10) register upon completion.
-=======
 ### 📝 Step 1: Write a C Program
 
 Write your desired C code in the `tst.c` file. The program should return its final result from the `main` function, which will then be available in the `a0` (`x10`) register upon completion.
->>>>>>> b5349666734042f32b51610da77dd367575ee22b
 
 ```c
 // Example: tst.c
