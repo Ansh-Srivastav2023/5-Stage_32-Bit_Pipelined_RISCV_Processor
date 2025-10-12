@@ -1,15 +1,15 @@
-#5-Stage Pipelined RISC-V Core
-##1. Overview
+# 5-Stage Pipelined RISC-V Core
+## 1. Overview
 This project is a complete implementation of a 32-bit RISC-V processor written in Verilog. It features a classic 5-stage pipeline architecture (Fetch, Decode, Execute, Memory, Write-Back) designed to execute a subset of the RISC-V instruction set. The core is capable of running C code compiled using a standard RISC-V GCC toolchain.
 
 The design prioritizes correctness and clarity, with a full implementation of hazard detection and data forwarding to maximize pipeline efficiency and handle data dependencies correctly.
 
-##2. Core Features
+## 2. Core Features
 The processor implements the following architectural features:
 
-ISA Support: RV32IMC
+**ISA Support: RV32IMC**
 
-I: Base Integer Instruction Set
+**I**: Base Integer Instruction Set
 
 M: Hardware Multiplier and Divider Extension
 
@@ -40,8 +40,8 @@ Branch decisions are resolved early in the Decode (ID) stage rather than the Exe
 This reduces the penalty for a taken branch to a single-cycle flush, improving performance.
 
 Compressed Instruction Support: Includes a decompressor module to fully support the 'C' extension, reducing code size by 25-30%.
-
-##3. Architecture
+ 
+## 3. Architecture
 The processor follows a standard 5-stage pipeline design. Key components include the Control Unit, Register File, ALU, pipeline registers, and hazard management units.
 
 ##4. Toolchain & Simulation
@@ -54,7 +54,7 @@ Verilog Simulator: iverilog (Icarus Verilog) and vvp.
 
 Build Tool: make.
 
-##5. How to Use
+## 5. How to Use
 The entire build and simulation process is automated using the provided Makefile.
 
 Step 1: Write a C Program
