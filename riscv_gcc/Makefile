@@ -10,7 +10,7 @@ ASM_SRC = crt0.S
 OBJ     = $(C_SRC:.c=.o) $(ASM_SRC:.S=.o)
 ELF     = tst.elf
 DISASM  = disasm.txt
-HEX     = /media/anx/New_Volume/Importants/Verilog/Branch_Improved/Processor_Files/instr_mem.hex
+HEX     = /media/anx/New_Volume/Importants/Verilog/Pipelined_Processor/rtl_files/instr_mem.hex
 
 .PHONY: all clean
 

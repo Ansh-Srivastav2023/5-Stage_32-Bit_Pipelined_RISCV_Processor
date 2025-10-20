@@ -13,15 +13,29 @@
 
 
 
-#define LED_ADDR 0x0c  // Replace with actual GPIO address
+// #define LED_ADDR 0x0c  // Replace with actual GPIO address
 
-void main() {
-    volatile unsigned int *led = (unsigned int *)LED_ADDR;
+// void main() {
+//     volatile unsigned int *led = (unsigned int *)LED_ADDR;
 
-    while (1) {
-        *led = 0xFF;  // Turn on LEDs
-        for (volatile int i = 0; i < 100000; i++);  // Delay
-        *led = 0x00;  // Turn off LEDs
-        for (volatile int i = 0; i < 100000; i++);  // Delay
+//     while (1) {
+//         *led = 0xFF;  // Turn on LEDs
+//         for (volatile int i = 0; i < 100000; i++);  // Delay
+//         *led = 0x00;  // Turn off LEDs
+//         for (volatile int i = 0; i < 100000; i++);  // Delay
+//     }
+// }
+
+__attribute__((noninline))
+
+
+int main(){
+    volatile int a;
+    volatile int b = 0;
+
+    for (a = 0; a<=4; a= a+1){
+        b = b+a;
     }
+
+    return b;
 }

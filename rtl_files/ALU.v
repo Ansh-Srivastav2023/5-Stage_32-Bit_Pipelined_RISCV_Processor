@@ -76,7 +76,3 @@ module Multiplexer_ALUCtrl(A, B, sel, Out);
     assign Out = sel ? B : A;
 
 endmodule
-
-
-
-
