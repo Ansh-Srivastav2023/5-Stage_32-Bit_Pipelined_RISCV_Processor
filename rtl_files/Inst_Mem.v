@@ -5,7 +5,7 @@ module Inst_Mem(PC, rst, instruction);
 
     reg [31:0] instruction_mem [0:1024];
     
-    assign instruction = (!rst) ? {31{1'b0}} : instruction_mem[{PC[31:2]}];
+    assign instruction = (!rst) ? {32{1'b0}} : instruction_mem[{PC[31:2]}];
 
     initial $readmemh("instr_mem.hex", instruction_mem);
     

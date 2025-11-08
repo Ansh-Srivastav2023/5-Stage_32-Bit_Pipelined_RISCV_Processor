@@ -1,6 +1,6 @@
-module MEM_WB(RegWrite, MemReadData, ALUresult, rd_EXMEM, clk, rst, ResultSrc, PC, PC_MEM, ResultSrc_MEM, RegWrite_MEM, MemReadData_MEM, ALUresult_MEM, rd_EXMEM_MEM, PC_next_EX, PC_next_MEM);
+module MEM_WB(RegWrite, stall, MemReadData, ALUresult, rd_EXMEM, clk, rst, ResultSrc, PC, PC_MEM, ResultSrc_MEM, RegWrite_MEM, MemReadData_MEM, ALUresult_MEM, rd_EXMEM_MEM, PC_next_EX, PC_next_MEM);
 
-    input RegWrite, clk, rst;
+    input RegWrite, clk, rst, stall;
     input [1:0] ResultSrc;
     input [31:0] MemReadData, ALUresult, PC, PC_next_EX;
     input [4:0] rd_EXMEM;
@@ -14,6 +14,8 @@ module MEM_WB(RegWrite, MemReadData, ALUresult, rd_EXMEM, clk, rst, ResultSrc, P
         if(~rst) begin
             {PC_next_MEM, PC_MEM, ResultSrc_MEM, RegWrite_MEM, MemReadData_MEM, ALUresult_MEM, rd_EXMEM_MEM} <= 'b0;
         end
+        else if (stall)
+            {PC_next_MEM, PC_MEM, ResultSrc_MEM, RegWrite_MEM, MemReadData_MEM, ALUresult_MEM, rd_EXMEM_MEM} <= {PC_next_MEM, PC_MEM, ResultSrc_MEM, RegWrite_MEM, MemReadData_MEM, ALUresult_MEM, rd_EXMEM_MEM};
         else
             {PC_next_MEM, PC_MEM, ResultSrc_MEM, RegWrite_MEM, MemReadData_MEM, ALUresult_MEM, rd_EXMEM_MEM} <= {PC_next_EX, PC, ResultSrc, RegWrite, MemReadData, ALUresult, rd_EXMEM};
     end

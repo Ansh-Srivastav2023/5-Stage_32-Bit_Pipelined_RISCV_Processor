@@ -1,0 +1,9 @@
+read_verilog -sv Top_Module.v
+hierarchy -top Top_Module
+
+# synth_xilinx -family xc7 -top Top_Module -flatten -edif top.edf
+
+proc; opt; fsm; opt; techmap; opt
+
+stat
+tee -o stat.txt stat

@@ -10,8 +10,23 @@
 //         "ebreak\n"           // halt for debug
 //     );
 // }
+// #include <stdio.h>
 
+__attribute__((noinline))
+int main(){
+    volatile int a = 2;
+    volatile int b = 1;
 
+    for(int i = 5; i > 0; i-=1){
+        b = a*b;
+        a = b+2;
+        b = a*2;
+        a = b+2+a;
+    }
+
+    return b;
+    // printf("b = %d", b);
+}
 
 // #define LED_ADDR 0x0c  // Replace with actual GPIO address
 
@@ -25,17 +40,3 @@
 //         for (volatile int i = 0; i < 100000; i++);  // Delay
 //     }
 // }
-
-__attribute__((noninline))
-
-
-int main(){
-    volatile int a;
-    volatile int b = 0;
-
-    for (a = 0; a<=4; a= a+1){
-        b = b+a;
-    }
-
-    return b;
-}

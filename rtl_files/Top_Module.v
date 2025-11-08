@@ -1,3 +1,6 @@
+`default_nettype none
+
+
 `include "PC.v"
 `include "ALU.v"
 `include "IF_ID.v"
@@ -13,6 +16,7 @@
 `include "Data_Memory.v"
 `include "Control_Unit.v"
 `include "FourXone_mux.v"
+`include "mult_div_stall.v"
 `include "Decompressor_mux.v"
 `include "Forwarding_Block.v"
 `include "Hazard_Detection.v"
@@ -21,7 +25,8 @@
 
 module Top_Module (
     input clk,
-    input rst
+    input rst,
+    output Carry
 );
 
     wire [31:0] PC, PC_next, PCPlus4, instruction;
@@ -38,7 +43,7 @@ module Top_Module (
     
     wire [31:0] PC_IF, instruction_IF;
 
-    wire RegWrite_ID, is_compressed;
+    wire RegWrite_ID, is_compressed, stall, mul_done, div_done;
     wire [1:0] Mem_Con_ID, ForwardA, ForwardB, isPC_select, isPC_select_ID;
     wire [31:0] PC_ID, data1_ID, data2_ID, ImmExt_ID, instruction_ID;
 
@@ -60,7 +65,7 @@ module Top_Module (
         .clk(clk), 
         .rst(rst), 
         .PC(PC),
-        .PCWrite(PCWriteEN));
+        .PCWrite(PCWriteEN & ~stall));
     PCPlus4 PCplus4(
         .PC(PC), 
         .rst(rst), 
@@ -75,7 +80,7 @@ module Top_Module (
     Decompressor_mux Decomp_Mux (
         .instr(initial_instr[1:0]), 
         .is_compressed(is_compressed));
-    Multiplexer compressed_mupltiplex(
+    Multiplexer compressed_multiplex(
         .A(initial_instr), 
         .B(compress_instr), 
         .sel(is_compressed), 
@@ -92,11 +97,11 @@ module Top_Module (
         .instruction(instruction), 
         .PC_IF(PC_IF), 
         .instruction_IF(instruction_IF),
-        .IF_ID_WriteEN(IF_ID_WriteEN), 
+        .IF_ID_WriteEN(IF_ID_WriteEN & ~stall), 
         .Flush(Flush),
         .PC_next(PC_next),
         .PC_next_IF(PC_next_IF));
-
+        
 
     Control_Unit Control_Unit(
         .opcode(instruction_IF[6:0]),
@@ -163,17 +168,20 @@ module Top_Module (
         .isPC_select(isPC_select),
         .isPC_select_ID(isPC_select_ID),
         .PC_next_IF(PC_next_IF),
-        .PC_next_ID(PC_next_ID));
+        .PC_next_ID(PC_next_ID),
+        .stall(stall));
 
 
 
     ALU ALU(
         .rdA(rdA), 
-        .rdB(rdB), 
+        .rdB(rdB), .rst(rst), .clk(clk), 
         .ALUControl(ALUControl_ID), 
         .ALUresult(ALUresult), 
         .Carry(Carry), 
-        .Zero(Zero));
+        .Zero(Zero),
+        .mul_done(mul_done),
+        .div_done(div_done));
     FourXone_mux ForwA_mux (.A(data1_ID), .B(Result), .C(ALUresult_EX), .sel(ForwardA), .Out(data1_ID_ForwA));
     FourXone_mux ForwB_mux (.A(data2_ID), .B(Result), .C(ALUresult_EX), .sel(ForwardB), .Out(rdB_ForwB));
     Multiplexer Multiplex_ALU (
@@ -222,7 +230,9 @@ module Top_Module (
         .data2_EX(data2_EX), 
         .rd_ID_EX_EX(rd_ID_EX_EX),
         .PC_next_ID(PC_next_ID),
-        .PC_next_EX(PC_next_EX));
+        .PC_next_EX(PC_next_EX),
+        .stall(stall));
+    mult_div_stall mult_div_stall (.ALUControl_5(ALUControl_ID[4]), .stall(stall), .rst(rst), .mul_done(mul_done), .div_done(div_done));
 
         assign PCSrc = rst ? (Branch_ID & (Zero ^ B_Zero_ID)) | Jump_ID | JumpReg_ID : 1'b0;
 
@@ -249,7 +259,8 @@ module Top_Module (
         .ALUresult_MEM(ALUresult_MEM), 
         .rd_EXMEM_MEM(rd_EXMEM_MEM),
         .PC_next_EX(PC_next_EX),
-        .PC_next_MEM(PC_next_MEM));
+        .PC_next_MEM(PC_next_MEM),
+        .stall(stall));
 
     multiplex_3x1 multipplex_result0 (
         .A(ALUresult_MEM), 
@@ -296,4 +307,9 @@ module Top_Module (
     assign data2 = (RegWrite_MEM && (rd_EXMEM_MEM != 5'b0) && (rd_EXMEM_MEM == instruction_IF[24:20]))
                 ? Result      // Forward the final result from WB stage
                 : rf_data2;   // Use the value from the register file
+
+    initial begin
+        $dumpfile("RISCV.vcd");
+        $dumpvars(0, Top_Module);
+    end
 endmodule

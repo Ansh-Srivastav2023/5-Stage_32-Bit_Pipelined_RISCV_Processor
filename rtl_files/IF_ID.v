@@ -7,7 +7,10 @@ module IF_ID(clk, rst, PC, instruction, PC_IF, instruction_IF, IF_ID_WriteEN, Fl
     output reg [31:0] PC_next_IF;
     
     always @(posedge clk or negedge rst) begin
-        if(~rst || Flush) begin
+        if(~rst) begin
+            {PC_next_IF, PC_IF, instruction_IF} <= 'b0;
+        end
+        else if(Flush) begin
             {PC_next_IF, PC_IF, instruction_IF} <= 'b0;
         end
         else if(IF_ID_WriteEN) 
