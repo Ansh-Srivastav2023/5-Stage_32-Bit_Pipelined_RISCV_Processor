@@ -1,0 +1,4 @@
+# Simulation waveforms
+*.vcd
+*.vpd
+*.fsdb
