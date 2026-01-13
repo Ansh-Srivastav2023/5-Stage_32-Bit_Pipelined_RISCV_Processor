@@ -2,3 +2,4 @@
 *.vcd
 *.vpd
 *.fsdb
+*.v.out
