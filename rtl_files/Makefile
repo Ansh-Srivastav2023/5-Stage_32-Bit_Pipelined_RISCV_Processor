@@ -13,8 +13,8 @@ ABI      ?= ilp32
 ARCH_FLAGS = -march=$(ARCH) -mabi=$(ABI)
 
 # Paths
-GCC_FILE_PATH := /media/anx/New_Volume/Importants/Verilog/Branch_Improved/riscv_gcc
-RTL_FILE_PATH := /media/anx/New_Volume/Importants/Verilog/Branch_Improved/rtl_files
+GCC_FILE_PATH := /media/anx/New_Volume/Importants/Verilog/Pipelined_Processor/riscv_gcc
+RTL_FILE_PATH := /media/anx/New_Volume/Importants/Verilog/Pipelined_Processor/rtl_files
 
 # Compiler / Linker flags
 CFLAGS  = $(ARCH_FLAGS) -O2 -Wall -Wextra -ffreestanding \
@@ -76,7 +76,8 @@ simulate: $(HEX) $(TB)
 	@echo "Running Verilog Testbench..."
 	@mkdir -p $(dir $(SIMV)) $(dir $(SIM_OUT))
 	$(IVERILOG) -g2012 -o $(SIMV) $(TB)
-	$(VVP) $(SIMV) > sim_output.txt 2>&1
+	$(VVP) $(SIMV) 
+# 	$(VVP) $(SIMV) > sim_output.txt 2>&1
 
 # ---------- Handy utilities ----------
 
@@ -92,4 +93,4 @@ hex: $(HEX)
 # ---------- Clean ----------
 
 clean:
-	rm -f $(OBJ) $(ELF) $(BIN) $(DISASM) $(SIM_OUT) $(SIMV) $(HEX)
+	rm -f $(OBJ) $(ELF) $(BIN) $(DISASM) $(SIM_OUT) $(SIMV) 

@@ -1,4 +1,5 @@
 `include "Top_Module.v"
+`timescale 1ps/1ps
 
 module Testbench;
 
@@ -12,20 +13,24 @@ module Testbench;
         rst = 1'b0;
 
         #2 rst = ~rst;
-        // wait (uut.IDEX.instruction_ID == 32'h0000006f)
-        #200
+        wait (uut.IDEX.instruction_ID == 32'h0000006f)
         $finish;
     end
     
     initial begin
-        $monitor("Time = %0t", $time,   
+        $monitor( 
+                "    x0 = %0d", uut.Register.register[0], 
+                "    x1 = %0d", uut.Register.register[1], 
                 "    x2 = %0d", uut.Register.register[2], 
-                "    x13 = %0d", uut.Register.register[3], 
+                "    x3 = %0d", uut.Register.register[3], 
+                "    x5 = %0d", uut.Register.register[5], 
                 "    x10 = %0d", uut.Register.register[10],  
-                "    x14 = %0d", uut.Register.register[14], 
-                "    x15 = %0d", uut.Register.register[15], 
-                "    m8  = %0d",  uut.Data_Memory.mem[1021], 
-                "    m12 = %0d", uut.Data_Memory.mem[1016]);        
+                "    x12 = %0d", uut.Register.register[12],  
+                "    x13 = %0d", uut.Register.register[13],  
+                // "    x15 = %0d", uut.Register.register[15], 
+                "    m3 = %0d",  uut.Data_Memory.mem[3],
+                "    m1022 = %0d",  uut.Data_Memory.mem[1022], 
+                "    m1023 = %0d", uut.Data_Memory.mem[1023]);        
     end 
 
 endmodule //testbench

@@ -1,6 +1,4 @@
-`default_nettype none
-
-
+// `default_nettype none
 `include "PC.v"
 `include "ALU.v"
 `include "IF_ID.v"

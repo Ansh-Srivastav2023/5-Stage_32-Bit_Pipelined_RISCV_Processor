@@ -12,31 +12,27 @@
 // }
 // #include <stdio.h>
 
-__attribute__((noinline))
-int main(){
-    volatile int a = 2;
-    volatile int b = 1;
+// __attribute__((noinline))
+// int main(){
+//     volatile int a = 2;
+//     volatile int b = 1;
 
-    for(int i = 5; i > 0; i-=1){
-        b = a*b;
-        a = b+2;
-        b = a*2;
-        a = b+2+a;
-    }
-
-    return b;
-    // printf("b = %d", b);
-}
-
-// #define LED_ADDR 0x0c  // Replace with actual GPIO address
-
-// void main() {
-//     volatile unsigned int *led = (unsigned int *)LED_ADDR;
-
-//     while (1) {
-//         *led = 0xFF;  // Turn on LEDs
-//         for (volatile int i = 0; i < 100000; i++);  // Delay
-//         *led = 0x00;  // Turn off LEDs
-//         for (volatile int i = 0; i < 100000; i++);  // Delay
+//     for(int i = 1; i > 0; i--){
+//         b = b+a;
 //     }
+
+//     return b;
 // }
+
+#define LED_ADDR 0x0c  // Replace with actual GPIO address
+
+void main() {
+    volatile unsigned int *led = (unsigned int *)LED_ADDR;
+
+    while (1) {
+        *led = 0xFF;  // Turn on LEDs
+        for (volatile int i = 0; i < 1000; i++);  // Delay
+        *led = 0x00;  // Turn off LEDs
+        for (volatile int i = 0; i < 1000; i++);  // Delay
+    }
+}
