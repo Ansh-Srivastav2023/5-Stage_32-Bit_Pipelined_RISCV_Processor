@@ -4,18 +4,28 @@ module Data_Memory (clk, MemWrite, MemRead, MemWriteData, MemReadData, ALUresult
     input  [31:0] ALUresult;
     input  signed [31:0] MemWriteData;
 
-    output signed [31:0] MemReadData;
+    output reg signed [31:0] MemReadData;
 
-    reg signed [31:0] mem [0:1023];
+    (* ram_style = "block" *)
+    reg signed [31:0] mem [0:16383];
 
-    assign MemReadData = MemRead ? mem[ALUresult[31:2]] : 'b0;
+    wire [13:0] address = ALUresult[15:2];
 
+    // assign MemReadData = MemRead ? mem[address] : 'b0;
+    
     always @(posedge clk) begin
         if(MemWrite)
-            mem[ALUresult[31:2]] <= MemWriteData;
+            mem[address] <= MemWriteData;
+    end
+    
+    always @(negedge clk) begin
+        MemReadData = MemRead ? mem[address] : 'b0; 
+    end
+
+    initial begin
+        $readmemh("data_mem.hex", mem);
     end
 
 endmodule //Data_Memory
-
 
 

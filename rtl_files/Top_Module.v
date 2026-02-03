@@ -1,4 +1,6 @@
-// `default_nettype none
+`default_nettype none
+`timescale 1ps/1ps
+
 `include "PC.v"
 `include "ALU.v"
 `include "IF_ID.v"
@@ -24,13 +26,14 @@
 module Top_Module (
     input clk,
     input rst,
-    output Carry
+    output Carry,
+    output [14:0] Data_Out
 );
 
     wire [31:0] PC, PC_next, PCPlus4, instruction;
     
     wire [31:0] Result, data1, data2, ImmExt, PC_ALU_Sum, initial_instr, compress_instr, data1_ID_ForwA, rdB_ForwB, rf_data1, rf_data2;
-    wire RegWrite, JumpReg, Jump, Branch, PCSrc, ALUSrc, Zero, MemWrite, MemRead, ALUSrc_ID, PCWriteEN, IF_ID_WriteEN, NOP, B_Zero, B_Zero_ID, Branch_ID, Jump_ID, JumpReg_ID, Flush;
+    wire RegWrite, RegRead, JumpReg, Jump, Branch, PCSrc, ALUSrc, Zero, MemWrite, MemRead, ALUSrc_ID, PCWriteEN, IF_ID_WriteEN, NOP, B_Zero, B_Zero_ID, Branch_ID, Jump_ID, JumpReg_ID, Flush;
     wire [31:0] rdA, rdB, ALUresult,PC_Branch;
     
     wire [2:0] ImmType, ImmType_ID;
@@ -47,7 +50,7 @@ module Top_Module (
 
     wire [31:0] PC_EX, PC_ALU_Sum_EX, ALUresult_EX, data2_EX;
     wire [1:0] ResultSrc_EX, Mem_Con_EX, ResultSrc_MEM;
-    wire PCSrc_EX, RegWrite_EX, Branch_EX, Zero_EX, RegWrite_MEM;
+    wire PCSrc_EX, RegWrite_EX, Branch_EX, Zero_EX, RegWrite_MEM, stall_EX, stall_MEM;
     wire [4:0] rd_ID_EX_EX, rd_EXMEM_MEM, rd_ID;
 
     wire [31:0] PC_MEM, MemReadData_MEM, ALUresult_MEM;
@@ -57,6 +60,8 @@ module Top_Module (
     wire [2:0] ImmTypeHZ;
     wire [4:0] ALUControlHZ;
     wire [31:0] PC_next_IF, PC_next_ID, PC_next_EX, PC_next_MEM;
+
+    wire [31:0] debug_reg_a10;
 
     PC PC0(
         .PC_next(PC_next), 
@@ -71,6 +76,7 @@ module Top_Module (
     Inst_Mem Inst_Mem (
         .PC(PC), 
         .rst(rst), 
+        .clk(clk),
         .instruction(initial_instr));
     Decompressor Decompressor(
         .r_instr(compress_instr), 
@@ -117,6 +123,7 @@ module Top_Module (
         .ALUControl(ALUControl), 
         .rst(rst),
         .B_Zero(B_Zero),
+        .RegRead(RegRead),
         .isPC_select(isPC_select));
         
     Register Register(
@@ -127,8 +134,13 @@ module Top_Module (
         .rs1(instruction_IF[19:15]), 
         .rs2(instruction_IF[24:20]), 
         .w_add(rd_EXMEM_MEM), 
-        .RegWrite(RegWrite_MEM), 
-        .RegWriteData(Result));
+        .RegWrite(RegWrite_MEM & ~stall_MEM), 
+        .RegWriteData(Result),
+        .debug_reg(debug_reg_a10));
+
+    assign Data_Out = debug_reg_a10[14:0]; // For observing register x10 (a0)
+
+
     Imm_Extend Imm0(
         .instruction(instruction_IF[31:0]), 
         .ImmType(ImmType), 
@@ -229,7 +241,8 @@ module Top_Module (
         .rd_ID_EX_EX(rd_ID_EX_EX),
         .PC_next_ID(PC_next_ID),
         .PC_next_EX(PC_next_EX),
-        .stall(stall));
+        .stall(stall), 
+        .stall_EX(stall_EX));
     mult_div_stall mult_div_stall (.ALUControl_5(ALUControl_ID[4]), .stall(stall), .rst(rst), .mul_done(mul_done), .div_done(div_done));
 
         assign PCSrc = rst ? (Branch_ID & (Zero ^ B_Zero_ID)) | Jump_ID | JumpReg_ID : 1'b0;
@@ -258,7 +271,8 @@ module Top_Module (
         .rd_EXMEM_MEM(rd_EXMEM_MEM),
         .PC_next_EX(PC_next_EX),
         .PC_next_MEM(PC_next_MEM),
-        .stall(stall));
+        .stall_EX(stall_EX),
+        .stall_MEM(stall_MEM));
 
     multiplex_3x1 multipplex_result0 (
         .A(ALUresult_MEM), 
@@ -287,7 +301,7 @@ module Top_Module (
         .ID_EX_rd(rd_ID), 
         .IF_ID_rs1(instruction_IF[19:15]), 
         .IF_ID_rs2(instruction_IF[24:20]),
-        .Branch(Branch_ID & (Zero ^ B_Zero)),
+        .Branch(Branch_ID & (Zero ^ B_Zero_ID)),
         .Jump(Jump_ID),
         .JumpReg(JumpReg_ID), 
         .Flush(Flush));
@@ -308,6 +322,6 @@ module Top_Module (
 
     initial begin
         $dumpfile("RISCV.vcd");
-        $dumpvars(0, Top_Module);
+        $dumpvars(0);
     end
-endmodule
+endmodule   
