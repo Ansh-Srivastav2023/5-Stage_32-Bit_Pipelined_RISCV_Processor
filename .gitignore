@@ -3,3 +3,4 @@
 *.vpd
 *.fsdb
 *.v.out
+obj_dir

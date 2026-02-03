@@ -69,26 +69,32 @@ module Top_Module (
         .rst(rst), 
         .PC(PC),
         .PCWrite(PCWriteEN & ~stall));
+
     PCPlus4 PCplus4(
         .PC(PC), 
         .rst(rst), 
         .PCPlus4(PCPlus4));
+
     Inst_Mem Inst_Mem (
         .PC(PC), 
         .rst(rst), 
         .clk(clk),
         .instruction(initial_instr));
+
     Decompressor Decompressor(
         .r_instr(compress_instr), 
         .c_instr(initial_instr[15:0]));
+
     Decompressor_mux Decomp_Mux (
         .instr(initial_instr[1:0]), 
         .is_compressed(is_compressed));
+
     Multiplexer compressed_multiplex(
         .A(initial_instr), 
         .B(compress_instr), 
         .sel(is_compressed), 
         .Out(instruction));
+        
     Multiplexer MultiPC (
         .A(PCPlus4), 
         .B(PC_ALU_Sum), 

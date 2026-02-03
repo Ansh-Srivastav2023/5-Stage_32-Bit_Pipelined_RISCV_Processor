@@ -1,3 +1,24 @@
+# TOP = Testbench		# name of the top module
+# SRC = Testbench.v	# clname of the file
+
+# all: slang_test build run
+
+# slang_test:
+# 	slang $(SRC)
+
+# build:
+# 	verilator --sv --binary $(SRC) --quiet
+# # 	make -C obj_dir -f V$(TOP).mk V$(TOP) --quiet
+
+# run:
+# 	./obj_dir/V$(TOP) --quiet
+
+# clean:
+# 	rm -rf obj_dir logs *.log
+# 	clear
+
+
+
 # ===== RISC-V bare-metal build + Testbench simulation =====
 
 # Toolchain (xPack riscv-none-elf in /opt/riscv/bin)
