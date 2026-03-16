@@ -4,3 +4,6 @@
 *.fsdb
 *.v.out
 obj_dir
+*.bin
+*.elf
+tst
