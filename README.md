@@ -116,18 +116,73 @@ make clean
 ```text
 
 📦 Project Files:
-├── Top_Module.v              # The top-level module that connects all processor components
-├── Control_Unit.v            # Decodes instructions and generates control signals
-├── ALU.v                     # Performs arithmetic and logical operations
-├── Register.v                # The 32-entry RISC-V register file
-├── Forwarding_Block.v        # Implements data forwarding logic
-├── Hazard_Detection.v        # Stalls the pipeline for load-use hazards
-├── *.v                       # Other Verilog modules for various components (memory, muxes, etc.)
-├── tst.c                     # The C source code to be compiled and run on the processor
-├── crt0.S                    # Bare-metal startup code
-├── link.ld                   # Linker script defining the memory map
-├── Makefile                  # Automates the build and simulation process
-└── Testbench.v               # The Verilog testbench for simulating the processor   `
+├── bootloader
+│   ├── bootloader.s
+│   └── boot.sh
+├── design
+│   ├── EX
+│   │   ├── ALU.v
+│   │   ├── Forwarding_Block.v
+│   │   ├── Hazard_Detection.v
+│   │   ├── ID_EX.v
+│   │   └── mult_div_stall.v
+│   ├── ID
+│   │   ├── Control_Unit.v
+│   │   ├── Ctrl_mux.v
+│   │   ├── IF_ID.v
+│   │   ├── Imm_Extend.v
+│   │   ├── Register.v
+│   │   └── RTypeALUControl.v
+│   ├── IF
+│   │   ├── Decompressor_mux.v
+│   │   ├── Inst_Mem.v
+│   │   ├── Instr_Decompressor.v
+│   │   ├── PCPlus4.v
+│   │   └── PC.v
+│   ├── include.v
+│   ├── MA
+│   │   ├── bootloader_rom.hex
+│   │   ├── build
+│   │   │   ├── dump.vcd
+│   │   │   └── UART.out
+│   │   ├── data_mem.hex
+│   │   ├── Data_Memory.v
+│   │   ├── EX_MEM.v
+│   │   ├── FIFO_UART_top.v
+│   │   ├── FIFO.v
+│   │   ├── instr_mem.hex
+│   │   ├── UART_addr_sel.v
+│   │   ├── UART.v
+│   │   └── UART.v.out
+│   ├── Reset_Sync.v
+│   └── WB
+│       ├── FourXone_mux.v
+│       ├── MEM_WB.v
+│       └── Multiplexer.v
+├── riscv_gcc
+│   ├── crt0.S
+│   ├── disasm.txt
+│   ├── link.ld
+│   ├── tst
+│   └── tst.c
+├── run_make.sh
+├── sta
+│   ├── final_netlist.v
+│   ├── run_sta.tcl
+│   ├── script.ys
+│   ├── xilinx_netlist0.v
+│   └── xilinx_netlist.v
+├── top_module
+│   ├── Makefile
+│   ├── Testbench.v
+│   ├── Testbench.v.out
+│   ├── top
+│   ├── Top_Module.v
+│   └── Top_Module.v.out
+└── verilator
+    ├── main.cpp
+    ├── Makefile
+    └── RISCV.vcd
 ```
 
 ## FPGA implementation images:
