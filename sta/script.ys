@@ -1,0 +1,37 @@
+read_verilog /media/anx/New_Volume/Importants/Verilog/open_sta/top_module/Top_Module.v
+hierarchy -top Top_Module
+
+proc
+synth_xilinx -top Top_Module
+opt_clean -purge
+stat
+write_verilog -noattr -noexpr xilinx_netlist.v
+
+
+
+
+
+
+
+# read_verilog /media/anx/New_Volume/Importants/Verilog/open_sta/top_module/Top_Module.v
+
+# # read_liberty -lib /media/anx/New_Volume/Importants/Verilog/open_sta/Data_Mem_stub.lib
+
+# hierarchy -top Top_Module
+# proc
+# opt
+# memory
+# opt
+# techmap
+# opt
+
+# dfflibmap -liberty /home/anx/OpenSTA/examples/nangate45_fast.lib
+
+# splitnets -ports
+# opt
+# abc -liberty /home/anx/OpenSTA/examples/nangate45_fast.lib -script +strash;ifraig;scorr;dc2;dretime;strash;&get,-n;&dch,-f;&nf,{D};&put
+
+
+# stat -liberty /home/anx/OpenSTA/examples/nangate45_fast.lib
+
+# write_verilog -noattr -noexpr xilinx_netlist0.v

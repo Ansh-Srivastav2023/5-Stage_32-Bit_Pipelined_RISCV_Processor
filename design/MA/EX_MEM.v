@@ -15,7 +15,7 @@ module EX_MEM(clk, stall, rst, PC_ALU_Sum, Zero, ALUresult, data2, rd_ID_EX, Reg
             {stall_EX, PC_next_EX, PC_EX, ResultSrc_EX, PCSrc_EX, RegWrite_EX, Mem_Con_EX, Branch_EX, PC_ALU_Sum_EX, Zero_EX, ALUresult_EX, data2_EX, rd_ID_EX_EX} <= 'b0;
         end
         // else if(stall)
-        //     {PC_next_EX, PC_EX, ResultSrc_EX, PCSrc_EX, RegWrite_EX, Mem_Con_EX, Branch_EX, PC_ALU_Sum_EX, Zero_EX, ALUresult_EX, data2_EX, rd_ID_EX_EX} <= {PC_next_EX, PC_EX, ResultSrc_EX, PCSrc_EX, RegWrite_EX, Mem_Con_EX, Branch_EX, PC_ALU_Sum_EX, Zero_EX, ALUresult_EX, data2_EX, rd_ID_EX_EX};
+        //     {stall_EX, PC_next_EX, PC_EX, ResultSrc_EX, PCSrc_EX, RegWrite_EX, Mem_Con_EX, Branch_EX, PC_ALU_Sum_EX, Zero_EX, ALUresult_EX, data2_EX, rd_ID_EX_EX} <= {stall, PC_next_EX, PC_EX, ResultSrc_EX, PCSrc_EX, RegWrite_EX, Mem_Con_EX, Branch_EX, PC_ALU_Sum_EX, Zero_EX, ALUresult_EX, data2_EX, rd_ID_EX_EX};
         else
             {stall_EX, PC_next_EX, PC_EX, ResultSrc_EX, PCSrc_EX, RegWrite_EX, Mem_Con_EX, Branch_EX, PC_ALU_Sum_EX, Zero_EX, ALUresult_EX, data2_EX, rd_ID_EX_EX} <= {stall, PC_next_ID, PC, ResultSrc, PCSrc, RegWrite, Mem_Con, Branch, PC_ALU_Sum, Zero, ALUresult, data2, rd_ID_EX};
     end

@@ -1,27 +1,54 @@
 
-/media/anx/New_Volume/Importants/Verilog/Pipelined_Processor/riscv_gcc/tst.elf:     file format elf32-littleriscv
+/media/anx/New_Volume/Importants/Verilog/open_sta/riscv_gcc/tst.elf:     file format elf32-littleriscv
 
 
 Disassembly of section .init:
 
-00000000 <_start>:
-   0:	00001117          	auipc	sp,0x1
-   4:	00010113          	mv	sp,sp
-   8:	008000ef          	jal	10 <main>
-   c:	0000006f          	j	c <_start+0xc>
+20000000 <_start>:
+20000000:	0000a117          	auipc	sp,0xa
+20000004:	00010113          	mv	sp,sp
+20000008:	00008297          	auipc	t0,0x8
+2000000c:	ff828293          	addi	t0,t0,-8 # 20008000 <_bss_end>
+20000010:	00008317          	auipc	t1,0x8
+20000014:	ff030313          	addi	t1,t1,-16 # 20008000 <_bss_end>
+
+20000018 <bss_clear>:
+20000018:	00628863          	beq	t0,t1,20000028 <jump_main>
+2000001c:	0002a023          	sw	zero,0(t0)
+20000020:	00428293          	addi	t0,t0,4
+20000024:	ff5ff06f          	j	20000018 <bss_clear>
+
+20000028 <jump_main>:
+20000028:	00c000ef          	jal	20000034 <main>
+2000002c:	00100073          	ebreak
+
+20000030 <loop_forever>:
+20000030:	0000006f          	j	20000030 <loop_forever>
 
 Disassembly of section .text:
 
-00000010 <main>:
-  10:	ff010113          	addi	sp,sp,-16 # ff0 <main+0xfe0>
-  14:	00200793          	li	a5,2
-  18:	00f12423          	sw	a5,8(sp)
-  1c:	00100793          	li	a5,1
-  20:	00f12623          	sw	a5,12(sp)
-  24:	00c12783          	lw	a5,12(sp)
-  28:	00812703          	lw	a4,8(sp)
-  2c:	00e787b3          	add	a5,a5,a4
-  30:	00f12623          	sw	a5,12(sp)
-  34:	00c12503          	lw	a0,12(sp)
-  38:	01010113          	addi	sp,sp,16
-  3c:	00008067          	ret
+20000034 <main>:
+20000034:	00004737          	lui	a4,0x4
+20000038:	ff010113          	addi	sp,sp,-16 # 20009ff0 <_data_end+0x1ff0>
+2000003c:	a9770713          	addi	a4,a4,-1385 # 3a97 <_start-0x1fffc569>
+20000040:	900006b7          	lui	a3,0x90000
+20000044:	0ff00613          	li	a2,255
+20000048:	0006a023          	sw	zero,0(a3) # 90000000 <_stack_top+0x6fff6000>
+2000004c:	00012423          	sw	zero,8(sp)
+20000050:	00812783          	lw	a5,8(sp)
+20000054:	00f74c63          	blt	a4,a5,2000006c <main+0x38>
+20000058:	00812783          	lw	a5,8(sp)
+2000005c:	00178793          	addi	a5,a5,1
+20000060:	00f12423          	sw	a5,8(sp)
+20000064:	00812783          	lw	a5,8(sp)
+20000068:	fef758e3          	bge	a4,a5,20000058 <main+0x24>
+2000006c:	00c6a023          	sw	a2,0(a3)
+20000070:	00012623          	sw	zero,12(sp)
+20000074:	00c12783          	lw	a5,12(sp)
+20000078:	fcf748e3          	blt	a4,a5,20000048 <main+0x14>
+2000007c:	00c12783          	lw	a5,12(sp)
+20000080:	00178793          	addi	a5,a5,1
+20000084:	00f12623          	sw	a5,12(sp)
+20000088:	00c12783          	lw	a5,12(sp)
+2000008c:	fef758e3          	bge	a4,a5,2000007c <main+0x48>
+20000090:	fb9ff06f          	j	20000048 <main+0x14>
