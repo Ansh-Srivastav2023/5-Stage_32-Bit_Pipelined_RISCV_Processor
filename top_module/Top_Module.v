@@ -5,10 +5,11 @@
 
 
 module Top_Module (
-    input clk,
-    input async_rst,
+    input  clk,
+    input  async_rst,
+    input  Rx_Serial,
     output Carry,
-    output Tx_Done, Rx_Done, Tx_Serial, full, empty,
+    output Tx_Serial, 
     output [15:0] IO_OUT
 );
 
@@ -46,6 +47,11 @@ module Top_Module (
 
     wire [1:0] UART_Mem_wt;
 
+    wire [7:0] FIFO_Rx_Dout;
+    wire Rx_read_en, full_Rx, empty_Rx;
+
+
+
     Reset_Sync Reset_Sync(.async_rst(async_rst), .clk(clk), .sync_rst(rst));
 
     PC PC0(
@@ -58,11 +64,8 @@ module Top_Module (
         .PC(PC), 
         .rst(rst), 
         .PCPlus4(PCPlus4));
-    // Inst_Mem Inst_Mem (
-    //     .PC(PC), 
-    //     .rst(rst), 
-    //     .clk(clk),
-    //     .instruction(initial_instr));
+
+
     Decompressor Decompressor(
         .r_instr(compress_instr), 
         .c_instr(initial_instr[15:0]));
@@ -127,6 +130,7 @@ module Top_Module (
         .instruction(instruction_IF[31:0]), 
         .ImmType(ImmType), 
         .ImmExt(ImmExt));
+
     ID_EX IDEX (
         .clk(clk), 
         .rst(rst), 
@@ -165,145 +169,171 @@ module Top_Module (
 
 
     ALU ALU(
-        .rdA(rdA), 
-        .rdB(rdB), .rst(rst), .clk(clk), 
-        .ALUControl(ALUControl_ID), 
-        .ALUresult(ALUresult), 
-        .Carry(Carry), 
-        .Zero(Zero),
-        .mul_active(mul_active),
-        .div_active(div_active));
+            .rdA(rdA), 
+            .rdB(rdB), .rst(rst), .clk(clk), 
+            .ALUControl(ALUControl_ID), 
+            .ALUresult(ALUresult), 
+            .Carry(Carry), 
+            .Zero(Zero),
+            .mul_active(mul_active),
+            .div_active(div_active));
     FourXone_mux ForwA_mux (.A(data1_ID), .B(Result), .C(ALUresult_EX), .sel(ForwardA), .Out(data1_ID_ForwA));
     FourXone_mux ForwB_mux (.A(data2_ID), .B(Result), .C(ALUresult_EX), .sel(ForwardB), .Out(rdB_ForwB));
     Multiplexer Multiplex_ALU (
-        .A(rdB_ForwB), 
-        .B(ImmExt_ID), 
-        .sel(ALUSrc_ID), 
-        .Out(rdB));
+                    .A(rdB_ForwB), 
+                    .B(ImmExt_ID), 
+                    .sel(ALUSrc_ID), 
+                    .Out(rdB));
     PC_ALU_Adder PC_ALU_Adder0 (
-        .A(PC_ID), 
-        .B(ImmExt_ID), 
-        .Sum(PC_Branch));
+                    .A(PC_ID), 
+                    .B(ImmExt_ID), 
+                    .Sum(PC_Branch));
     Multiplexer Multiplex_jump_branch (
-        .A(PC_Branch), 
-        .B(ALUresult), 
-        .sel(JumpReg_ID), //EX_Con_ID[8]
-        .Out(PC_ALU_Sum));
+                    .A(PC_Branch), 
+                    .B(ALUresult), 
+                    .sel(JumpReg_ID),
+                    .Out(PC_ALU_Sum));
     multiplex_3x1 MUX_PC_Data (.A(data1_ID_ForwA),
-        .B(PC_ID), 
-        .C('b0),
-        .D('b0),
-        .sel(isPC_select_ID), 
-        .Result(rdA));
+                    .B(PC_ID), 
+                    .C('b0),
+                    .D('b0),
+                    .sel(isPC_select_ID), 
+                    .Result(rdA));
+
     EX_MEM EXMEM(
-        .clk(clk), 
-        .rst(rst), 
-        .PC_ALU_Sum(PC_ALU_Sum), 
-        .Zero(Zero), 
-        .ALUresult(ALUresult), 
-        .data2(rdB_ForwB), 
-        .rd_ID_EX(rd_ID), 
-        .RegWrite(RegWrite_ID), 
-        .Mem_Con(Mem_Con_ID), 
-        .Branch(Branch_ID), 
-        .PCSrc(PCSrc), 
-        .ResultSrc(ResultSrc_ID), 
-        .PC(PC_ID), 
-        .PC_EX(PC_EX), 
-        .ResultSrc_EX(ResultSrc_EX), 
-        .PCSrc_EX(PCSrc_EX), 
-        .RegWrite_EX(RegWrite_EX), 
-        .Mem_Con_EX(Mem_Con_EX), 
-        .Branch_EX(Branch_EX), 
-        .PC_ALU_Sum_EX(PC_ALU_Sum_EX), 
-        .Zero_EX(Zero_EX), 
-        .ALUresult_EX(ALUresult_EX), 
-        .data2_EX(data2_EX), 
-        .rd_ID_EX_EX(rd_ID_EX_EX),
-        .PC_next_ID(PC_next_ID),
-        .PC_next_EX(PC_next_EX),
-        .stall(stall), 
-        .stall_EX(stall_EX));
-    mult_div_stall mult_div_stall (.ALUControl_5(ALUControl_ID[4]), .stall(stall), .rst(rst), .mul_active(mul_active), .div_active(div_active));
+                .clk(clk), 
+                .rst(rst), 
+                .PC_ALU_Sum(PC_ALU_Sum), 
+                .Zero(Zero), 
+                .ALUresult(ALUresult), 
+                .data2(rdB_ForwB), 
+                .rd_ID_EX(rd_ID), 
+                .RegWrite(RegWrite_ID), 
+                .Mem_Con(Mem_Con_ID), 
+                .Branch(Branch_ID), 
+                .PCSrc(PCSrc), 
+                .ResultSrc(ResultSrc_ID), 
+                .PC(PC_ID), 
+                .PC_EX(PC_EX), 
+                .ResultSrc_EX(ResultSrc_EX), 
+                .PCSrc_EX(PCSrc_EX), 
+                .RegWrite_EX(RegWrite_EX), 
+                .Mem_Con_EX(Mem_Con_EX), 
+                .Branch_EX(Branch_EX), 
+                .PC_ALU_Sum_EX(PC_ALU_Sum_EX), 
+                .Zero_EX(Zero_EX), 
+                .ALUresult_EX(ALUresult_EX), 
+                .data2_EX(data2_EX), 
+                .rd_ID_EX_EX(rd_ID_EX_EX),
+                .PC_next_ID(PC_next_ID),
+                .PC_next_EX(PC_next_EX),
+                .stall(stall), 
+                .stall_EX(stall_EX));
+
+    mult_div_stall mult_div_stall (.ALUControl_5(ALUControl_ID[4]), 
+                                    .stall(stall), .rst(rst), 
+                                    .mul_active(mul_active), 
+                                    .div_active(div_active));
 
         assign PCSrc = rst ? (Branch_ID & (Zero ^ B_Zero_ID)) | Jump_ID | JumpReg_ID : 1'b0;
 
     Data_Memory Data_Memory(
-        .clk(clk), 
-        .MemWrite(Mem_Con_EX[1] && (UART_Mem_wt == 2'b01)), 
-        .MemRead(Mem_Con_EX[0]), 
-        .MemWriteData(data2_EX), 
-        .ALUresult(ALUresult_EX), 
-        .PC(PC),
-        .portA(initial_instr),
-        .portB(MemReadData));
+                .clk(clk), 
+                .MemWrite(Mem_Con_EX[1] && (UART_Mem_wt == 2'b01)), 
+                .MemRead(Mem_Con_EX[0]), 
+                .MemWriteData(data2_EX), 
+                .Rx_Data(FIFO_Rx_Dout),
+                .ALUresult(ALUresult_EX), 
+                .PC(PC),
+                .full_Rx(full_Rx),
+                .empty_Rx(empty_Rx),
+                .Rx_read_en(Rx_read_en),
+                .portA(initial_instr),
+                .portB(MemReadData));
 
     MEM_WB MEMWB (
-        .RegWrite(RegWrite_EX), 
-        .MemReadData(MemReadData), 
-        .ALUresult(ALUresult_EX), 
-        .rd_EXMEM(rd_ID_EX_EX), 
-        .clk(clk), 
-        .rst(rst), 
-        .stall(stall),
-        .ResultSrc(ResultSrc_EX), 
-        .PC(PC_EX), 
-        .PC_MEM(PC_MEM), 
-        .ResultSrc_MEM(ResultSrc_MEM), 
-        .RegWrite_MEM(RegWrite_MEM), 
-        .MemReadData_MEM(MemReadData_MEM), 
-        .ALUresult_MEM(ALUresult_MEM), 
-        .rd_EXMEM_MEM(rd_EXMEM_MEM),
-        .PC_next_EX(PC_next_EX),
-        .PC_next_MEM(PC_next_MEM),
-        .stall_EX(stall_EX),
-        .stall_MEM(stall_MEM));
+            .RegWrite(RegWrite_EX), 
+            .MemReadData(MemReadData), 
+            .ALUresult(ALUresult_EX), 
+            .rd_EXMEM(rd_ID_EX_EX), 
+            .clk(clk), 
+            .rst(rst), 
+            .stall(stall),
+            .ResultSrc(ResultSrc_EX), 
+            .PC(PC_EX), 
+            .PC_MEM(PC_MEM), 
+            .ResultSrc_MEM(ResultSrc_MEM), 
+            .RegWrite_MEM(RegWrite_MEM), 
+            .MemReadData_MEM(MemReadData_MEM), 
+            .ALUresult_MEM(ALUresult_MEM), 
+            .rd_EXMEM_MEM(rd_EXMEM_MEM),
+            .PC_next_EX(PC_next_EX),
+            .PC_next_MEM(PC_next_MEM),
+            .stall_EX(stall_EX),
+            .stall_MEM(stall_MEM));
 
     multiplex_3x1 multipplex_result0 (
-        .A(ALUresult_MEM), 
-        .B(MemReadData_MEM), 
-        .C(PC_next_MEM), 
-        .D('b0), 
-        .sel(ResultSrc_MEM), 
-        .Result(Result));
+                    .A(ALUresult_MEM), 
+                    .B(MemReadData_MEM), 
+                    .C(PC_next_MEM), 
+                    .D('b0), 
+                    .sel(ResultSrc_MEM), 
+                    .Result(Result));
 
 
     Forwarding_Block FB (
-        .EX_MEM_RegWrite(RegWrite_EX), 
-        .MEM_WB_RegWrite(RegWrite_MEM), 
-        .ID_EX_rs1(rs1_ID), 
-        .ID_EX_rs2(rs2_ID), 
-        .EX_MEM_rd(rd_ID_EX_EX), 
-        .MEM_WB_rd(rd_EXMEM_MEM), 
-        .ForwardA(ForwardA), 
-        .ForwardB(ForwardB));
+                        .EX_MEM_RegWrite(RegWrite_EX), 
+                        .MEM_WB_RegWrite(RegWrite_MEM), 
+                        .ID_EX_rs1(rs1_ID), 
+                        .ID_EX_rs2(rs2_ID), 
+                        .EX_MEM_rd(rd_ID_EX_EX), 
+                        .MEM_WB_rd(rd_EXMEM_MEM), 
+                        .ForwardA(ForwardA), 
+                        .ForwardB(ForwardB));
 
 
     Ld_Ctrl_HZ Haz_Det (.PCWriteEN(PCWriteEN), 
-        .IF_ID_WriteEN(IF_ID_WriteEN), 
-        .NOP(NOP), 
-        .ID_EX_MemRead(Mem_Con_ID[0]), 
-        .ID_EX_rd(rd_ID), 
-        .IF_ID_rs1(instruction_IF[19:15]), 
-        .IF_ID_rs2(instruction_IF[24:20]),
-        .Branch(Branch_ID & (Zero ^ B_Zero_ID)),
-        .Jump(Jump_ID),
-        .JumpReg(JumpReg_ID), 
-        .Flush(Flush));
+                        .IF_ID_WriteEN(IF_ID_WriteEN), 
+                        .NOP(NOP), 
+                        .ID_EX_MemRead(Mem_Con_ID[0]), 
+                        .ID_EX_rd(rd_ID), 
+                        .IF_ID_rs1(instruction_IF[19:15]), 
+                        .IF_ID_rs2(instruction_IF[24:20]),
+                        .Branch(Branch_ID & (Zero ^ B_Zero_ID)),
+                        .Jump(Jump_ID),
+                        .JumpReg(JumpReg_ID), 
+                        .Flush(Flush));
 
     
-    Ctrl_mux Ctrl_Mux (.RegWrite(RegWrite), .MemWrite(MemWrite), .MemRead(MemRead), .ALUSrc(ALUSrc), .ResultSrc(ResultSrc), .Branch(Branch), .Jump(Jump), .JumpReg(JumpReg), .ImmType(ImmType), .ALUControl(ALUControl), .sel(NOP), .RegWriteHZ(RegWriteHZ), .MemWriteHZ(MemWriteHZ), .MemReadHZ(MemReadHZ), .ALUSrcHZ(ALUSrcHZ), .ResultSrcHZ(ResultSrcHZ), .BranchHZ(BranchHZ), .JumpHZ(JumpHZ), .JumpRegHZ(JumpRegHZ), .ImmTypeHZ(ImmTypeHZ), .ALUControlHZ(ALUControlHZ));
+    Ctrl_mux Ctrl_Mux (.RegWrite(RegWrite), 
+                        .MemWrite(MemWrite), 
+                        .MemRead(MemRead), 
+                        .ALUSrc(ALUSrc), 
+                        .ResultSrc(ResultSrc), 
+                        .Branch(Branch), 
+                        .Jump(Jump), 
+                        .JumpReg(JumpReg), 
+                        .ImmType(ImmType), 
+                        .ALUControl(ALUControl), 
+                        .sel(NOP), .RegWriteHZ(RegWriteHZ), 
+                        .MemWriteHZ(MemWriteHZ), 
+                        .MemReadHZ(MemReadHZ), 
+                        .ALUSrcHZ(ALUSrcHZ), 
+                        .ResultSrcHZ(ResultSrcHZ), 
+                        .BranchHZ(BranchHZ), 
+                        .JumpHZ(JumpHZ), 
+                        .JumpRegHZ(JumpRegHZ), 
+                        .ImmTypeHZ(ImmTypeHZ), 
+                        .ALUControlHZ(ALUControlHZ));
 
-    // Bypass logic
-    // Logic for the first source register (rs1)
+
     assign data1 = (RegWrite_MEM && (rd_EXMEM_MEM != 5'b0) && (rd_EXMEM_MEM == instruction_IF[19:15]))
                 ? Result      // Forward the final result from WB stage
-                : rf_data1;   // Use the value from the register file
+                : rf_data1;
 
-    // Logic for the second source register (rs2)
     assign data2 = (RegWrite_MEM && (rd_EXMEM_MEM != 5'b0) && (rd_EXMEM_MEM == instruction_IF[24:20]))
                 ? Result      // Forward the final result from WB stage
-                : rf_data2;   // Use the value from the register file
+                : rf_data2;
 
 
 
@@ -313,19 +343,26 @@ module Top_Module (
                                 .IO_OUT_temp(data2_EX[15:0]),
                                 .IO_OUT(IO_OUT));
 
-    FIFO_UART_top fifo_uart (.clk(clk), .rst(rst), 
-                            .write_en(UART_Mem_wt == 2'b10), 
-                            .data_in(data2_EX[7:0]), 
-                            .Tx_Serial(Tx_Serial), 
-                            .Tx_Done(Tx_Done),  
-                            .Rx_Done(Rx_Done), 
-                            .full(full), .empty(empty));
+    FIFO_UART_top fifo_uart    (.clk(clk), .rst(rst), 
+                                .write_en(UART_Mem_wt == 2'b10), 
+                                .Rx_read_en(Rx_read_en),
+                                .Tx_Din(data2_EX[7:0]), 
+                                .Tx_Serial(Tx_Serial),
+                                .Rx_Serial(Rx_Serial),
+                                .full_Rx(full_Rx),
+                                .empty_Rx(empty_Rx),
+                                .FIFO_Rx_Dout(FIFO_Rx_Dout));
     
 
-    // initial begin
-    //     // if ($test$plusargs("trace") || $test$plusargs("waves")) begin
-    //         $dumpfile("dump.vcd");
-    //         $dumpvars(0);
-    //     // end
-    // end
+                                
 endmodule
+   
+   
+   
+   
+// initial begin
+//     // if ($test$plusargs("trace") || $test$plusargs("waves")) begin
+//         $dumpfile("dump.vcd");
+//         $dumpvars(0);
+//     // end
+// end

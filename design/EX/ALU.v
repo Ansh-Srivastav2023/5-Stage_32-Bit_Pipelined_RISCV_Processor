@@ -5,11 +5,11 @@ module ALU #(parameter bits = 32)(
     input signed [bits-1:0] rdB,
     output Carry, Zero,
     output reg signed [bits-1:0] ALUresult,
-    output reg mul_active, div_active   
+    output wire mul_active, div_active   
 );
     
     wire [4:0] shamt;
-    reg [2*bits-1:0] mul_result;
+    wire [2*bits-1:0] mul_result;
     reg Cout;
 
     assign Carry = Cout;

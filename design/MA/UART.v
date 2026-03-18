@@ -211,7 +211,7 @@ endmodule
 
 module UART #(  parameter tick_div_tx = 4'd12, 
                 parameter tick_div_rx = 4'd12,
-                parameter dvsr = 16'd434) 
+                parameter dvsr = 16'd868) 
                 (clk, rst, Tx_Drive, Tx_Data, Tx_Serial, Tx_Active, Rx_Serial, Tx_Done, Rx_Done, data_out);
 
     input clk, rst, Tx_Drive, Rx_Serial;

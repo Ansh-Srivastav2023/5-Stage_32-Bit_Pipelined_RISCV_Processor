@@ -22,3 +22,4 @@ module Register (rs1, rs2, w_add, RegWrite, RegWriteData, clk, rst, data1, data2
     assign data2 = ~rst ? 32'b0 : register[rs2];
 
 endmodule
+

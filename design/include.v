@@ -2,7 +2,6 @@
 `include "/media/anx/New_Volume/Importants/Verilog/open_sta/design/IF/PCPlus4.v"
 `include "/media/anx/New_Volume/Importants/Verilog/open_sta/design/IF/Decompressor_mux.v"
 `include "/media/anx/New_Volume/Importants/Verilog/open_sta/design/IF/Instr_Decompressor.v"
-// `include "/media/anx/New_Volume/Importants/Verilog/open_sta/design/IF/Inst_Mem.v"
 
 `include "/media/anx/New_Volume/Importants/Verilog/open_sta/design/ID/Control_Unit.v"
 `include "/media/anx/New_Volume/Importants/Verilog/open_sta/design/ID/Ctrl_mux.v"

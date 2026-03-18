@@ -8,15 +8,15 @@ ARCH      ?= rv32im
 ABI       ?= ilp32
 ARCHFLAGS = -march=$(ARCH) -mabi=$(ABI)
 
-GCC_DIR := /media/anx/New_Volume/Importants/Verilog/Pipelined_Processor/riscv_gcc
-RTL_DIR := /media/anx/New_Volume/Importants/Verilog/Pipelined_Processor/top_module
+GCC_DIR := /media/anx/New_Volume/Importants/Verilog/open_sta/riscv_gcc
+RTL_DIR := /media/anx/New_Volume/Importants/Verilog/open_sta/top_module
 PARNET_DIR := $(abspath $(CURDIR)/..)
 
 
 C_SRC    = $(GCC_DIR)/tst.c
 ASM_SRC  = $(GCC_DIR)/crt0.S
 
-OBJ      = $(C_SRC:.c=.o) $(ASM_SRC:.S=.o)
+OBJ      = $(ASM_SRC:.S=.o) $(C_SRC:.c=.o)
 
 ELF      = $(GCC_DIR)/tst.elf
 BIN      = $(GCC_DIR)/tst.bin
@@ -91,7 +91,7 @@ $(DMEM_HEX): $(ELF)
 			--only-section=.data \
 			--only-section=.sdata \
 			$< $(GCC_DIR)/dmem.bin; \
-		echo "@00002000" > $@; \
+		echo "@0000000" > $@; \
 		hexdump -v -e '1/4 "%08x" "\n"' $(GCC_DIR)/dmem.bin >> $@; \
 		rm -f $(GCC_DIR)/dmem.bin; \
 	else \
