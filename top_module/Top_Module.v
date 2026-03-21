@@ -1,7 +1,5 @@
-`default_nettype none
+`default_nettype wire
 `timescale 1ns/1ps
-
-`include "/media/anx/New_Volume/Importants/Verilog/open_sta/design/include.v"
 
 
 module Top_Module (

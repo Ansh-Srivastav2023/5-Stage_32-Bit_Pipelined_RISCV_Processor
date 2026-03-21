@@ -1,5 +1,5 @@
-`timescale 1ns/1ps
 `default_nettype wire
+`timescale 1ns/1ps
 
 module uart_tx (
     input tick, Tx_Drive,
@@ -74,14 +74,20 @@ module uart_tx (
 
             s_STOP: begin
                 Tx_Serial <= 1'b1;
-                Tx_Active <= 1'b0;
-                state     <= s_IDLE;
-                count     <= 'b0;
-                Tx_Done   <= 1'b1;
+                if(count == tick_div - 1'b1) begin
+                    count     <= 'b0;
+                    state     <= s_IDLE;
+                    Tx_Done   <= 1'b1;
+                    Tx_Active <= 1'b0;
+                end
+                else begin
+                    count <= count + 1'b1;
+                end
             end
 
             default: begin
                 state <= s_IDLE;
+                Tx_Serial <= 1'b1;
             end
             endcase
         end
@@ -104,11 +110,7 @@ module uart_rx (
 
     integer i;
 
-    reg mem [0:7];
-
-    always @(*) begin
-        data_out = {mem[7], mem[6], mem[5], mem[4], mem[3], mem[2], mem[1], mem[0]};        
-    end
+    reg [7:0] mem;
 
     always @(posedge tick or negedge rst) begin
         if (~rst) begin
@@ -136,8 +138,8 @@ module uart_rx (
                     end              
                 end
 
-                s_Start:
-                begin
+                s_Start: begin
+                    Rx_Done <= 1'b0;
                     count <= count + 1'b1;
                     if(count == (clk_div/2 - 1'b1)) begin
                         if (Rx_Serial == 1'b0) begin
@@ -152,6 +154,7 @@ module uart_rx (
                 end
 
                 s_Read: begin
+                    Rx_Done <= 1'b0;
                 if (count == clk_div - 1'b1) begin
                     count   <= 'b0;
 
@@ -171,8 +174,17 @@ module uart_rx (
                 end
 
                 s_Stop: begin 
-                    state   <= s_Idle;
-                    Rx_Done <= 1'b1;
+                    // if(count == clk_div - 1'b1) begin
+                        state   <= s_Idle;
+                        Rx_Done <= 1'b1;
+                        count <= 0;
+                        data_out <= mem;
+                    // end
+
+                    // else begin
+                    //     state <= s_Stop;
+                    //     count <= count + 1'b1;
+                    // end
                 end
                 default : state <= s_Idle;
                     
@@ -211,7 +223,7 @@ endmodule
 
 module UART #(  parameter tick_div_tx = 4'd12, 
                 parameter tick_div_rx = 4'd12,
-                parameter dvsr = 16'd868) 
+                parameter dvsr = 16'd20) 
                 (clk, rst, Tx_Drive, Tx_Data, Tx_Serial, Tx_Active, Rx_Serial, Tx_Done, Rx_Done, data_out);
 
     input clk, rst, Tx_Drive, Rx_Serial;
