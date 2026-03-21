@@ -1,5 +1,5 @@
 
-/media/anx/New_Volume/Importants/Verilog/open_sta/riscv_gcc/tst.elf:     file format elf32-littleriscv
+/media/anx/New_Volume/Importants/Verilog/Pipelined_Processor/riscv_gcc/tst.elf:     file format elf32-littleriscv
 
 
 Disassembly of section .init:
@@ -19,7 +19,7 @@ Disassembly of section .init:
 20000024:	ff5ff06f          	j	20000018 <bss_clear>
 
 20000028 <jump_main>:
-20000028:	00c000ef          	jal	20000034 <main>
+20000028:	024000ef          	jal	2000004c <main>
 2000002c:	00100073          	ebreak
 
 20000030 <loop_forever>:
@@ -27,28 +27,26 @@ Disassembly of section .init:
 
 Disassembly of section .text:
 
-20000034 <main>:
-20000034:	00004737          	lui	a4,0x4
-20000038:	ff010113          	addi	sp,sp,-16 # 20009ff0 <_data_end+0x1ff0>
-2000003c:	a9770713          	addi	a4,a4,-1385 # 3a97 <_start-0x1fffc569>
-20000040:	900006b7          	lui	a3,0x90000
-20000044:	0ff00613          	li	a2,255
-20000048:	0006a023          	sw	zero,0(a3) # 90000000 <_stack_top+0x6fff6000>
-2000004c:	00012423          	sw	zero,8(sp)
-20000050:	00812783          	lw	a5,8(sp)
-20000054:	00f74c63          	blt	a4,a5,2000006c <main+0x38>
-20000058:	00812783          	lw	a5,8(sp)
-2000005c:	00178793          	addi	a5,a5,1
-20000060:	00f12423          	sw	a5,8(sp)
-20000064:	00812783          	lw	a5,8(sp)
-20000068:	fef758e3          	bge	a4,a5,20000058 <main+0x24>
-2000006c:	00c6a023          	sw	a2,0(a3)
-20000070:	00012623          	sw	zero,12(sp)
-20000074:	00c12783          	lw	a5,12(sp)
-20000078:	fcf748e3          	blt	a4,a5,20000048 <main+0x14>
-2000007c:	00c12783          	lw	a5,12(sp)
-20000080:	00178793          	addi	a5,a5,1
-20000084:	00f12623          	sw	a5,12(sp)
-20000088:	00c12783          	lw	a5,12(sp)
-2000008c:	fef758e3          	bge	a4,a5,2000007c <main+0x48>
-20000090:	fb9ff06f          	j	20000048 <main+0x14>
+20000034 <delay>:
+20000034:	00a05a63          	blez	a0,20000048 <delay+0x14>
+20000038:	00000793          	li	a5,0
+2000003c:	00000013          	nop
+20000040:	00178793          	addi	a5,a5,1
+20000044:	fef51ce3          	bne	a0,a5,2000003c <delay+0x8>
+20000048:	00008067          	ret
+
+2000004c <main>:
+2000004c:	00f00713          	li	a4,15
+20000050:	900006b7          	lui	a3,0x90000
+20000054:	000057b7          	lui	a5,0x5
+20000058:	00e6a023          	sw	a4,0(a3) # 90000000 <_stack_top+0x6fff6000>
+2000005c:	e2078793          	addi	a5,a5,-480 # 4e20 <_start-0x1fffb1e0>
+20000060:	00000013          	nop
+20000064:	fff78793          	addi	a5,a5,-1
+20000068:	fe079ce3          	bnez	a5,20000060 <main+0x14>
+2000006c:	00171793          	slli	a5,a4,0x1
+20000070:	01079793          	slli	a5,a5,0x10
+20000074:	0107d793          	srli	a5,a5,0x10
+20000078:	00f75713          	srli	a4,a4,0xf
+2000007c:	00f76733          	or	a4,a4,a5
+20000080:	fd5ff06f          	j	20000054 <main+0x8>
