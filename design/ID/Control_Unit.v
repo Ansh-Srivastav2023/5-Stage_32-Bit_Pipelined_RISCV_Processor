@@ -1,4 +1,5 @@
-`include "/media/anx/New_Volume/Importants/Verilog/open_sta/design/ID/RTypeALUControl.v"
+`default_nettype wire
+`timescale 1ns/1ps
 
 module Control_Unit(
     input  [6:0] opcode,

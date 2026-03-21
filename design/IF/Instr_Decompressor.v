@@ -1,3 +1,6 @@
+`default_nettype wire
+`timescale 1ns/1ps
+
 module Decompressor (
     input  [15:0] c_instr,  // Compressed 16-bit instruction
     output reg [31:0] r_instr   // Resulting 32-bit standard instruction

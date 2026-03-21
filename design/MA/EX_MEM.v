@@ -1,3 +1,6 @@
+`default_nettype wire
+`timescale 1ns/1ps
+
 module EX_MEM(clk, stall, rst, PC_ALU_Sum, Zero, ALUresult, data2, rd_ID_EX, RegWrite, Mem_Con, Branch, PCSrc, ResultSrc, PC, PC_EX, ResultSrc_EX, PCSrc_EX, RegWrite_EX, Mem_Con_EX, Branch_EX, PC_ALU_Sum_EX, Zero_EX, ALUresult_EX, data2_EX, rd_ID_EX_EX, PC_next_ID, PC_next_EX, stall_EX);
 
     input clk, rst, Zero, RegWrite, Branch, PCSrc, stall;

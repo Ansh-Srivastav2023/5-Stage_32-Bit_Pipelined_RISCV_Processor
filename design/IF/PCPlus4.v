@@ -1,3 +1,6 @@
+`default_nettype wire
+`timescale 1ns/1ps
+
 module PCPlus4 (PC, rst, PCPlus4);
 
     input [31:0] PC;

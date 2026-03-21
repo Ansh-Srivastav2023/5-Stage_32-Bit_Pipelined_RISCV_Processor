@@ -1,3 +1,6 @@
+`default_nettype wire
+`timescale 1ns/1ns
+
 module PC(PC_next, clk, rst, PC, PCWrite);
 
     input clk, rst;
@@ -7,7 +10,7 @@ module PC(PC_next, clk, rst, PC, PCWrite);
 
     always @(posedge clk or negedge rst) begin
         if(~rst)
-            PC <= 32'h20000000;
+            PC <= 32'h00000000;
         else if (!PCWrite)
             PC <= PC;
         else

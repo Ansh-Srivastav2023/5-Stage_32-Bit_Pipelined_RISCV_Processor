@@ -2,6 +2,6 @@ riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -nostdlib -Ttext 0x00000000 -o bootl
 
 riscv-none-elf-objcopy -O binary bootloader.elf bootloader.bin
 
-hexdump -v -e '1/4 "%08x\n"' bootloader.bin > bootloader_rom.hex
+hexdump -v -e '1/4 "%08x\n"' bootloader.bin > bootloader_rom.mem
 
-mv bootloader_rom.hex /media/anx/New_Volume/Importants/Verilog/open_sta/memory_files
+mv bootloader_rom.mem ../memory_files

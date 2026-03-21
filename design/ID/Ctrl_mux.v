@@ -1,3 +1,6 @@
+`default_nettype wire
+`timescale 1ns/1ps
+
 module Ctrl_mux (RegWrite, MemWrite, MemRead, ALUSrc, ResultSrc, Branch, Jump, JumpReg, ImmType, ALUControl, sel, RegWriteHZ, MemWriteHZ, MemReadHZ, ALUSrcHZ, ResultSrcHZ, BranchHZ, JumpHZ, JumpRegHZ, ImmTypeHZ, ALUControlHZ);
 
     input RegWrite, MemWrite, MemRead, ALUSrc, Branch, Jump, JumpReg;

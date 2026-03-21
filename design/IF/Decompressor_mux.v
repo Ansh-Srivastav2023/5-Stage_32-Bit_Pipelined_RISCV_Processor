@@ -1,3 +1,6 @@
+`default_nettype wire
+`timescale 1ns/1ps
+
 module Decompressor_mux (instr, is_compressed);
     input [1:0] instr;
     output is_compressed;

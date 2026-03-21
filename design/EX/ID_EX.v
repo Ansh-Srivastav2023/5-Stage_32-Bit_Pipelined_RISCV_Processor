@@ -1,3 +1,6 @@
+`default_nettype wire
+`timescale 1ns/1ps
+
 module ID_EX(clk, stall, rst, data1, data2, ImmExt, PC, instruction, RegWrite, Mem_Con, RegWrite_ID, Mem_Con_ID, PC_ID, data1_ID, data2_ID, ImmExt_ID, instruction_ID, rs1_ID, rs2_ID, rs1, rs2, ALUSrc, ALUSrc_ID, rd, rd_ID, B_Zero, B_Zero_ID, ResultSrcHZ, BranchHZ, JumpHZ, JumpRegHZ, ImmTypeHZ, ALUControlHZ, ResultSrc_ID, Branch_ID, Jump_ID, JumpReg_ID, ImmType_ID, ALUControl_ID, Flush, isPC_select, isPC_select_ID, PC_next_IF, PC_next_ID);
 
     input rst, clk, RegWrite, ALUSrc, B_Zero, BranchHZ, JumpHZ, JumpRegHZ, Flush, stall;

@@ -1,3 +1,6 @@
+`default_nettype wire
+`timescale 1ns/1ps
+
 module ALU #(parameter bits = 32)(
     input rst, clk,
     input [4:0] ALUControl,

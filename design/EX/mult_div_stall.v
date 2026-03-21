@@ -1,3 +1,6 @@
+`default_nettype wire
+`timescale 1ns/1ps
+
 module mult_div_stall (ALUControl_5, stall, mul_active, div_active, rst);
 
     input ALUControl_5, rst;

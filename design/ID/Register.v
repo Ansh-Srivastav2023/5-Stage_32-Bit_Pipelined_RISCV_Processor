@@ -1,4 +1,5 @@
-`default_nettype none
+`default_nettype wire
+`timescale 1ns/1ns
 
 module Register (rs1, rs2, w_add, RegWrite, RegWriteData, clk, rst, data1, data2);
 

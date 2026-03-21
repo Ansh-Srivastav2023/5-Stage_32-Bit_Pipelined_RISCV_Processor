@@ -1,3 +1,5 @@
+`default_nettype wire
+`timescale 1ns/1ps
 
 module IF_ID(clk, rst, PC, instruction, PC_IF, instruction_IF, IF_ID_WriteEN, Flush, PC_next, PC_next_IF);
     input [31:0] PC, instruction;
