@@ -8,9 +8,9 @@ ARCH      ?= rv32im
 ABI       ?= ilp32
 ARCHFLAGS = -march=$(ARCH) -mabi=$(ABI)
 
-GCC_DIR := /media/anx/New_Volume/Importants/Verilog/open_sta/riscv_gcc
-RTL_DIR := /media/anx/New_Volume/Importants/Verilog/open_sta/top_module
 PARNET_DIR := $(abspath $(CURDIR)/..)
+GCC_DIR := $(PARNET_DIR)/riscv_gcc
+RTL_DIR := $(PARNET_DIR)/top_module
 
 
 C_SRC    = $(GCC_DIR)/tst.c
