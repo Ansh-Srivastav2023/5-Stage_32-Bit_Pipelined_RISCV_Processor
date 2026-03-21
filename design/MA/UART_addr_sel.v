@@ -1,3 +1,6 @@
+`default_nettype wire
+`timescale 1ns/1ps
+
 module UART_addr_sel (
     input [31:0] ALUresult,
     input MemWrite,

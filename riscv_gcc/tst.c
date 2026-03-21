@@ -17,6 +17,28 @@
 // }
 
 
+#define addr 0x90000000
+
+void delay(int count) {
+    for (int i = 0; i < count; i++) {
+        __asm__ volatile ("nop"); 
+    }
+}
+
+int main() {
+    volatile unsigned int *led = (unsigned int *) addr;
+    
+    unsigned int pattern = 0x000F; // 4 bits ON (0000 0000 0000 1111)
+    
+    while (1) {
+        *led = pattern;
+        delay(20000); 
+        unsigned int top_bit = (pattern & 0x8000) >> 15;        
+        pattern = ((pattern << 1) & 0xFFFF) | top_bit;
+    }
+}
+
+
 // volatile int my_test_data = 0xDEADBEEF;
 // __attribute__((noinline))
 // int main(){

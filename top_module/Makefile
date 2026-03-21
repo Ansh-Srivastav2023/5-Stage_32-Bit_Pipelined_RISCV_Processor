@@ -22,8 +22,8 @@ ELF      = $(GCC_DIR)/tst.elf
 BIN      = $(GCC_DIR)/tst.bin
 DISASM   = $(GCC_DIR)/disasm.txt
 
-IMEM_HEX = $(PARNET_DIR)/design/MA/instr_mem.hex
-DMEM_HEX = $(PARNET_DIR)/design/MA/data_mem.hex
+IMEM_HEX = $(PARNET_DIR)/memory_files/instr_mem.mem
+DMEM_HEX = $(PARNET_DIR)/memory_files/data_mem.mem
 
 TB       = $(RTL_DIR)/Testbench.v
 SIMV     = $(RTL_DIR)/simv
@@ -41,49 +41,42 @@ ASFLAGS = $(ARCHFLAGS) -ffreestanding -c
 LDFLAGS = $(ARCHFLAGS) -T $(GCC_DIR)/link.ld -nostdlib -nostartfiles \
           --specs=nosys.specs
 
-.PHONY: all clean simulate size dump
+.PHONY: all clean size dump
 
 all: $(DISASM) $(IMEM_HEX) $(DMEM_HEX)
 
 
 $(ELF): $(OBJ) $(GCC_DIR)/link.ld
-	$(CC) $(LDFLAGS) -o $@ $(OBJ)
-	$(SIZE) $@
+	@ $(CC) $(LDFLAGS) -o $@ $(OBJ)
+	@ $(SIZE) $@
 
 $(DISASM): $(ELF)
-	$(OBJDUMP) -d -S $< > $@
+	@ $(OBJDUMP) -d -S $< > $@
 
 $(BIN): $(ELF)
-	$(OBJCOPY) -O binary $< $@
+	@ $(OBJCOPY) -O binary $< $@
 
 
 $(IMEM_HEX): $(ELF)
 	@echo "Generating Instruction Memory HEX (32-bit words)..."
 	@mkdir -p $(dir $@)
 	
-	# 1. Extract BOTH .init and .text sections to binary
-	#    Note: Since they are contiguous in your memory map (0x00 and 0x10),
-	#    this creates one smooth binary file.
-	$(OBJCOPY) -O binary \
+	@$(OBJCOPY) -O binary \
 		--only-section=.init \
 		--only-section=.text \
 		$< $(GCC_DIR)/imem.bin
 	
-	# 2. Add header
-	echo "@00000000" > $@
+	@echo "@00000000" > $@
 	
-	# 3. Convert binary to 32-bit Hex strings
-	hexdump -v -e '1/4 "%08x" "\n"' $(GCC_DIR)/imem.bin >> $@
+	@hexdump -v -e '1/4 "%08x" "\n"' $(GCC_DIR)/imem.bin >> $@
 	
-	# 4. Cleanup
-	rm -f $(GCC_DIR)/imem.bin
+	@rm -f $(GCC_DIR)/imem.bin
 
 
 $(DMEM_HEX): $(ELF)
 	@echo "Generating Data Memory HEX (32-bit words)..."
 	@mkdir -p $(dir $@)
 	
-	# Check if data sections exist
 	@if $(OBJDUMP) -h $< | grep -E "\.data|\.sdata|\.rodata" > /dev/null; then \
 		echo "  > Data sections detected. Extracting..."; \
 		$(OBJCOPY) -O binary \
@@ -95,28 +88,22 @@ $(DMEM_HEX): $(ELF)
 		hexdump -v -e '1/4 "%08x" "\n"' $(GCC_DIR)/dmem.bin >> $@; \
 		rm -f $(GCC_DIR)/dmem.bin; \
 	else \
-		echo "  > No data sections found. Creating empty data_mem.hex"; \
+		echo "  > No data sections found. Creating empty data_mem.mem"; \
 		touch $@; \
 	fi
 
 $(GCC_DIR)/%.o: $(GCC_DIR)/%.c
-	$(CC) $(CFLAGS) -o $@ $<
+	@$(CC) $(CFLAGS) -o $@ $<
 
 $(GCC_DIR)/%.o: $(GCC_DIR)/%.S
-	$(CC) $(ASFLAGS) -o $@ $<
-
-
-simulate: $(IMEM_HEX) $(DMEM_HEX) $(TB)
-	@echo "Running Verilog Simulation..."
-	$(IVERILOG) -g2012 -o $(SIMV) $(TB)
-	$(VVP) $(SIMV)
+	@$(CC) $(ASFLAGS) -o $@ $<
 
 
 size: $(ELF)
-	$(SIZE) $(ELF)
+	@$(SIZE) $(ELF)
 
 dump: $(ELF)
-	$(OBJDUMP) -d -S $(ELF) | less
+	@$(OBJDUMP) -d -S $(ELF) | less
 
 # ================= Clean =================
 

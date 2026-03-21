@@ -1,6 +1,5 @@
-`include "/media/anx/New_Volume/Importants/Verilog/open_sta/design/MA/FIFO.v"
-`include "/media/anx/New_Volume/Importants/Verilog/open_sta/design/MA/UART.v"
-
+`default_nettype wire
+`timescale 1ns/1ps
 
 module FIFO_UART_top(
     input clk, rst,
@@ -18,7 +17,7 @@ module FIFO_UART_top(
     wire Tx_Done, Rx_Done, full_Tx, empty_Tx;
     wire [7:0] FIFO_Tx_Dout, Rx_Data;
 
-    FIFO fifo_tx  (.clk(clk), .rst(rst), 
+    FIFO_Tx fifo_tx  (.clk(clk), .rst(rst), 
                     .data_in(Tx_Din), 
                     .write_en(write_en), 
                     .read_en(Tx_Done), 
@@ -27,9 +26,9 @@ module FIFO_UART_top(
                     .empty(empty_Tx));
     
     
-    FIFO fifo_rx  (.clk(clk), .rst(rst), 
+    FIFO_Rx fifo_rx  (.clk(clk), .rst(rst), 
                     .data_in(Rx_Data), 
-                    .write_en(Rx_Done), 
+                    .UART_Rx_Done(Rx_Done), 
                     .read_en(Rx_read_en), 
                     .data_out(FIFO_Rx_Dout), 
                     .full(full_Rx), 
@@ -47,5 +46,6 @@ module FIFO_UART_top(
                 .Rx_Serial(Rx_Serial),
                 .Rx_Done(Rx_Done),
                 .data_out(Rx_Data));
+
 
 endmodule
