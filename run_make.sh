@@ -3,11 +3,11 @@
 
 case ${1,,} in
 
-    iverilog) 
-        cd "/media/anx/New_Volume/Importants/Verilog/open_sta/top_module"
-        iverilog -o Testbench.v.out Testbench.v
-        vvp Testbench.v.out
-        ;;
+    # iverilog) 
+    #     cd "/media/anx/New_Volume/Importants/Verilog/open_sta/top_module"
+    #     iverilog -o Testbench.v.out Testbench.v
+    #     vvp Testbench.v.out
+    #     ;;
 
     clean)
         cd top_module

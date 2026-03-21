@@ -1,3 +1,6 @@
+`default_nettype wire
+`timescale 1ns/1ps
+
 module Ld_Ctrl_HZ (PCWriteEN, IF_ID_WriteEN, ID_EX_MemRead, NOP, ID_EX_rd, IF_ID_rs1, IF_ID_rs2, Branch, Jump, JumpReg, Flush);
 
     input [4:0] IF_ID_rs1, IF_ID_rs2, ID_EX_rd;
