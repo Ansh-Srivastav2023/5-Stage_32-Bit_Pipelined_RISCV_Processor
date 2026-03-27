@@ -1,5 +1,5 @@
 `default_nettype wire
-`timescale 1ns/1ps
+`timescale 1ns/1ns
 
 module ALU #(parameter bits = 32)(
     input rst, clk,
@@ -167,11 +167,3 @@ module ALU #(parameter bits = 32)(
 
 endmodule
 
-
-module PC_ALU_Adder (A, B, Sum);
-
-    input [31:0] A, B;
-    output [31:0] Sum;
-
-    assign Sum = A + B;
-endmodule 

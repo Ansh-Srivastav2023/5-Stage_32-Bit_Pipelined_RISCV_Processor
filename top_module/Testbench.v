@@ -1,5 +1,5 @@
 `default_nettype wire
-`timescale 1ns/1ps
+`timescale 1fs/1fs
 
 // dvsr = 434
 
@@ -74,11 +74,41 @@ module Testbench;
         end
 
 
-        wait (uut.IDEX.instruction_ID == 32'h0000006f)
+        wait (uut.instruction_IF == 32'h0000006f)
         wait (uut.fifo_uart.empty_Tx);
+        
+        @(posedge clk);
+        @(posedge clk);
 
-        @(posedge clk);
-        @(posedge clk);
+        // #20000;
+        
+        // rst = !rst;
+        
+        // #20 rst = !rst;
+
+        // @(posedge clk);
+        // @(posedge clk);
+        // @(posedge clk);
+
+        // Tx_Drivex = 1'b1;
+        // for(integer i = 0; i <= instr_mem[0]; i= i+1) begin
+        //     for (integer j = 0; j <= 24; j = j+8) begin
+        //         data_temp = instr_mem[i] >> j;
+        //         data_inx = data_temp[7:0];
+        //         #5 @(posedge uut.fifo_uart.uart.uart_rx.Rx_Done);
+        //         @(posedge tickx);
+        //     end
+        // end
+
+        // Tx_Drivex = 1'b0;
+        
+        // wait (uut.instruction_IF == 32'h0000006f)
+        // wait (uut.fifo_uart.empty_Tx);
+        
+        // @(posedge clk);
+        // @(posedge clk);
+
+        // #2000;
 
         $finish;
     end
@@ -92,8 +122,8 @@ module Testbench;
     //             // "    x4 = %0d", uut.Register.register[4],
     //             // "    x10 = %0d", uut.Register.register[10]
     //             // "Time = [%0t]" , $time,
-    //             // "Tx Data = %c", $signed(uut.fifo_uart.uart.uart_tx.data_in)
-                "Time = [%0t] | IO_OUT = %b", $time, IO_OUT
+                // "Tx Data = %c", $signed(uut.fifo_uart.uart.uart_tx.data_in)
+                "Time = [%0t] | IO_OUT = %c", $time, IO_OUT[7:0]
     //             "    x10 = %0d", uut.Register.register[10]
     //             // "    x12 = %0d", uut.Register.register[12],  
     //             // "    x13 = %0d", uut.Register.register[13],  

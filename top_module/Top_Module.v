@@ -15,10 +15,10 @@ module Top_Module (
     wire [31:0] PC, PC_next, PCPlus4, instruction;
     
     wire [31:0] Result, data1, data2, ImmExt, PC_ALU_Sum, initial_instr, compress_instr, data1_ID_ForwA, rdB_ForwB, rf_data1, rf_data2;
-    wire RegWrite, RegRead, JumpReg, Jump, Branch, PCSrc, ALUSrc, Zero, MemWrite, MemRead, ALUSrc_ID, PCWriteEN, IF_ID_WriteEN, NOP, B_Zero, B_Zero_ID, Branch_ID, Jump_ID, JumpReg_ID, Flush;
+    wire RegWrite, JumpReg, Jump, Branch, PCSrc, ALUSrc, Zero, MemWrite, MemRead, ALUSrc_ID, PCWriteEN, IF_ID_WriteEN, NOP, B_Zero, B_Zero_ID, Branch_ID, Jump_ID, JumpReg_ID, Flush;
     wire [31:0] rdA, rdB, ALUresult,PC_Branch;
     
-    wire [2:0] ImmType, ImmType_ID;
+    wire [2:0] ImmType;
     wire [1:0] ResultSrc, ResultSrc_ID;
     wire [4:0] ALUControl, rs1_ID, rs2_ID, ALUControl_ID;
         
@@ -28,18 +28,17 @@ module Top_Module (
 
     wire RegWrite_ID, is_compressed, stall, mul_active, div_active;
     wire [1:0] Mem_Con_ID, ForwardA, ForwardB, isPC_select, isPC_select_ID;
-    wire [31:0] PC_ID, data1_ID, data2_ID, ImmExt_ID, instruction_ID;
+    wire [31:0] PC_ID, data1_ID, data2_ID, ImmExt_ID;
 
-    wire [31:0] PC_EX, PC_ALU_Sum_EX, ALUresult_EX, data2_EX;
+    wire [31:0] ALUresult_EX, data2_EX;
     wire [1:0] ResultSrc_EX, Mem_Con_EX, ResultSrc_MEM;
-    wire PCSrc_EX, RegWrite_EX, Branch_EX, Zero_EX, RegWrite_MEM, stall_EX, stall_MEM;
+    wire RegWrite_EX, RegWrite_MEM, stall_EX, stall_MEM;
     wire [4:0] rd_ID_EX_EX, rd_EXMEM_MEM, rd_ID;
 
-    wire [31:0] PC_MEM, MemReadData_MEM, ALUresult_MEM;
+    wire [31:0] MemReadData_MEM, ALUresult_MEM;
 
-    wire RegWriteHZ, MemWriteHZ, MemReadHZ, ALUSrcHZ, PCSrcHZ, BranchHZ, JumpHZ, JumpRegHZ;
+    wire RegWriteHZ, MemWriteHZ, MemReadHZ, ALUSrcHZ, BranchHZ, JumpHZ, JumpRegHZ;
     wire [1:0] ResultSrcHZ;
-    wire [2:0] ImmTypeHZ;
     wire [4:0] ALUControlHZ;
     wire [31:0] PC_next_IF, PC_next_ID, PC_next_EX, PC_next_MEM;
 
@@ -47,7 +46,6 @@ module Top_Module (
 
     wire [7:0] FIFO_Rx_Dout;
     wire Rx_read_en, full_Rx, empty_Rx;
-
 
 
     Reset_Sync Reset_Sync(.async_rst(async_rst), .clk(clk), .sync_rst(rst));
@@ -107,9 +105,8 @@ module Top_Module (
         .JumpReg(JumpReg),
         .ImmType(ImmType),
         .ALUControl(ALUControl), 
-        .rst(rst),
         .B_Zero(B_Zero),
-        .RegRead(RegRead),
+        // .RegRead(RegRead),
         .isPC_select(isPC_select));
         
     Register Register(
@@ -125,7 +122,7 @@ module Top_Module (
 
 
     Imm_Extend Imm0(
-        .instruction(instruction_IF[31:0]), 
+        .instruction(instruction_IF[31:7]), 
         .ImmType(ImmType), 
         .ImmExt(ImmExt));
 
@@ -136,17 +133,15 @@ module Top_Module (
         .data2(data2), 
         .ImmExt(ImmExt), 
         .PC(PC_IF), 
-        .instruction({instruction_IF[31:0]}), 
         .RegWrite(RegWriteHZ), 
         .Mem_Con({MemWriteHZ, MemReadHZ}), 
-        .ResultSrcHZ(ResultSrcHZ), .BranchHZ(BranchHZ), .JumpHZ(JumpHZ), .JumpRegHZ(JumpRegHZ), .ImmTypeHZ(ImmTypeHZ), .ALUControlHZ(ALUControlHZ), 
+        .ResultSrcHZ(ResultSrcHZ), .BranchHZ(BranchHZ), .JumpHZ(JumpHZ), .JumpRegHZ(JumpRegHZ), .ALUControlHZ(ALUControlHZ), 
         .RegWrite_ID(RegWrite_ID),
         .Mem_Con_ID(Mem_Con_ID),
         .PC_ID(PC_ID),
         .data1_ID(data1_ID),
         .data2_ID(data2_ID),
         .ImmExt_ID(ImmExt_ID),
-        .instruction_ID(instruction_ID),
         .rs1(instruction_IF[19:15]),
         .rs2(instruction_IF[24:20]),
         .rs1_ID(rs1_ID),
@@ -157,7 +152,7 @@ module Top_Module (
         .rd_ID(rd_ID),
         .B_Zero(B_Zero),
         .B_Zero_ID(B_Zero_ID),
-        .ResultSrc_ID(ResultSrc_ID), .Branch_ID(Branch_ID), .Jump_ID(Jump_ID), .JumpReg_ID(JumpReg_ID), .ImmType_ID(ImmType_ID), .ALUControl_ID(ALUControl_ID),
+        .ResultSrc_ID(ResultSrc_ID), .Branch_ID(Branch_ID), .Jump_ID(Jump_ID), .JumpReg_ID(JumpReg_ID), .ALUControl_ID(ALUControl_ID),
         .Flush(Flush),
         .isPC_select(isPC_select),
         .isPC_select_ID(isPC_select_ID),
@@ -201,25 +196,15 @@ module Top_Module (
     EX_MEM EXMEM(
                 .clk(clk), 
                 .rst(rst), 
-                .PC_ALU_Sum(PC_ALU_Sum), 
-                .Zero(Zero), 
                 .ALUresult(ALUresult), 
                 .data2(rdB_ForwB), 
                 .rd_ID_EX(rd_ID), 
                 .RegWrite(RegWrite_ID), 
                 .Mem_Con(Mem_Con_ID), 
-                .Branch(Branch_ID), 
-                .PCSrc(PCSrc), 
                 .ResultSrc(ResultSrc_ID), 
-                .PC(PC_ID), 
-                .PC_EX(PC_EX), 
                 .ResultSrc_EX(ResultSrc_EX), 
-                .PCSrc_EX(PCSrc_EX), 
                 .RegWrite_EX(RegWrite_EX), 
                 .Mem_Con_EX(Mem_Con_EX), 
-                .Branch_EX(Branch_EX), 
-                .PC_ALU_Sum_EX(PC_ALU_Sum_EX), 
-                .Zero_EX(Zero_EX), 
                 .ALUresult_EX(ALUresult_EX), 
                 .data2_EX(data2_EX), 
                 .rd_ID_EX_EX(rd_ID_EX_EX),
@@ -228,8 +213,7 @@ module Top_Module (
                 .stall(stall), 
                 .stall_EX(stall_EX));
 
-    mult_div_stall mult_div_stall (.ALUControl_5(ALUControl_ID[4]), 
-                                    .stall(stall), .rst(rst), 
+    mult_div_stall mult_div_stall ( .stall(stall), .rst(rst), 
                                     .mul_active(mul_active), 
                                     .div_active(div_active));
 
@@ -242,7 +226,7 @@ module Top_Module (
                 .MemWriteData(data2_EX), 
                 .Rx_Data(FIFO_Rx_Dout),
                 .ALUresult(ALUresult_EX), 
-                .PC(PC),
+                .PC(PC[31:2]),
                 .full_Rx(full_Rx),
                 .empty_Rx(empty_Rx),
                 .Rx_read_en(Rx_read_en),
@@ -250,16 +234,13 @@ module Top_Module (
                 .portB(MemReadData));
 
     MEM_WB MEMWB (
+            .clk(clk), 
+            .rst(rst), 
             .RegWrite(RegWrite_EX), 
             .MemReadData(MemReadData), 
             .ALUresult(ALUresult_EX), 
             .rd_EXMEM(rd_ID_EX_EX), 
-            .clk(clk), 
-            .rst(rst), 
-            .stall(stall),
             .ResultSrc(ResultSrc_EX), 
-            .PC(PC_EX), 
-            .PC_MEM(PC_MEM), 
             .ResultSrc_MEM(ResultSrc_MEM), 
             .RegWrite_MEM(RegWrite_MEM), 
             .MemReadData_MEM(MemReadData_MEM), 
@@ -290,7 +271,7 @@ module Top_Module (
                         .ForwardB(ForwardB));
 
 
-    Ld_Ctrl_HZ Haz_Det (.PCWriteEN(PCWriteEN), 
+    Hazard_Detection Haz_Det (.PCWriteEN(PCWriteEN), 
                         .IF_ID_WriteEN(IF_ID_WriteEN), 
                         .NOP(NOP), 
                         .ID_EX_MemRead(Mem_Con_ID[0]), 
@@ -311,7 +292,6 @@ module Top_Module (
                         .Branch(Branch), 
                         .Jump(Jump), 
                         .JumpReg(JumpReg), 
-                        .ImmType(ImmType), 
                         .ALUControl(ALUControl), 
                         .sel(NOP), .RegWriteHZ(RegWriteHZ), 
                         .MemWriteHZ(MemWriteHZ), 
@@ -321,7 +301,6 @@ module Top_Module (
                         .BranchHZ(BranchHZ), 
                         .JumpHZ(JumpHZ), 
                         .JumpRegHZ(JumpRegHZ), 
-                        .ImmTypeHZ(ImmTypeHZ), 
                         .ALUControlHZ(ALUControlHZ));
 
 
@@ -336,7 +315,7 @@ module Top_Module (
 
 
     UART_addr_sel UART_addr_sel (.ALUresult(ALUresult_EX),
-                                .MemWrite(Mem_Con_EX[1]),
+                                .MemWrite(Mem_Con_EX[1]), .rst(rst),
                                 .UART_Mem_wt(UART_Mem_wt),
                                 .IO_OUT_temp(data2_EX[15:0]),
                                 .IO_OUT(IO_OUT));
