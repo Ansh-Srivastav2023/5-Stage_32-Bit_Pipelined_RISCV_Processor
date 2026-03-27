@@ -66,7 +66,8 @@ $(IMEM_HEX): $(ELF)
 		--only-section=.text \
 		$< $(GCC_DIR)/imem.bin
 	
-	@echo "@00000000" > $@
+# 	@echo "@00000000" > $@
+	@echo "" > $@
 	
 	@hexdump -v -e '1/4 "%08x" "\n"' $(GCC_DIR)/imem.bin >> $@
 	
@@ -84,7 +85,8 @@ $(DMEM_HEX): $(ELF)
 			--only-section=.data \
 			--only-section=.sdata \
 			$< $(GCC_DIR)/dmem.bin; \
-		echo "@0000000" > $@; \
+		@ echo "" > $@; \
+# 		@ echo "@0000200" > $@; \
 		hexdump -v -e '1/4 "%08x" "\n"' $(GCC_DIR)/dmem.bin >> $@; \
 		rm -f $(GCC_DIR)/dmem.bin; \
 	else \
