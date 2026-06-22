@@ -120,10 +120,10 @@ module Testbench;
     //             "    x2 = %0d", uut.Register.register[2],
     //             "    x3 = %0d", uut.Register.register[3],
     //             // "    x4 = %0d", uut.Register.register[4],
-    //             // "    x10 = %0d", uut.Register.register[10]
+                // "    x10 = %0d", uut.Register.register[10]
     //             // "Time = [%0t]" , $time,
                 // "Tx Data = %c", $signed(uut.fifo_uart.uart.uart_tx.data_in)
-                "Time = [%0t] | IO_OUT = %c", $time, IO_OUT[7:0]
+                "Time = [%0t] | IO_OUT = %d", $time, IO_OUT[7:0]
     //             "    x10 = %0d", uut.Register.register[10]
     //             // "    x12 = %0d", uut.Register.register[12],  
     //             // "    x13 = %0d", uut.Register.register[13],  

@@ -1,3 +1,5 @@
+`timescale 1ns/1ns
+
 module Multiplexer (A, B, sel, Out);
 
     input [31:0] A, B;

@@ -103,12 +103,15 @@ To remove all generated files (object files, executables, hex files, and simulat
 python automate.py clean
 ```
 
-## 6. Project Structure
+## 6. UART and I/O Port
+
+Addresses `0x80000000` and `0x90000000` are assigned for `UART` and `I/O` respectively.
+
+## 7. Project Structure
 
 ```text
-
 📦 Project Files:
-.
+|
 ├── automate.py
 ├── bootloader
 │   ├── bootloader.bin
@@ -197,4 +200,4 @@ python automate.py clean
 
 
 
-**👨‍💻 Author:** Ansh Srivastav
+**Author:** `Ansh Srivastav`

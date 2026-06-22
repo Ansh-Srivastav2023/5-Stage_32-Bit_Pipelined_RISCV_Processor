@@ -1,9 +1,9 @@
 `default_nettype wire
-`timescale 1ns/1ps
+`timescale 1ns/1ns
 
 module Imm_Extend (instruction, ImmType, ImmExt);
 
-    input [31:0] instruction;
+    input [31:7] instruction;
     input [2:0] ImmType;
 
     output reg [31:0] ImmExt;

@@ -31,7 +31,7 @@ run:
 
 
 clean:
-	rm -rf obj_dir logs *.log *.mem
+	rm -rf logs *.log *.mem
 	clear
 
 

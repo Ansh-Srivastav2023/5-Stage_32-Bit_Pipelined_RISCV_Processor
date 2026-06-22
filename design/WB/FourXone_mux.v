@@ -1,3 +1,5 @@
+`timescale 1ns/1ns
+
 module FourXone_mux (A, B, C, sel, Out);
 
     input [31:0] A, B, C;

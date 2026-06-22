@@ -1,7 +1,7 @@
 ENTRY(_start)
 
 MEMORY {
-    RAM (rwx) : ORIGIN = 0x20000000, LENGTH = 64k
+    RAM (rwx) : ORIGIN = 0x20000000, LENGTH = 4k
 }
 
 SECTIONS {
@@ -14,7 +14,7 @@ SECTIONS {
         *(.text.*)
     } > RAM
 
-    .data 0x20008000  : { 
+    .data 0x20000800  : { 
         _data_start = .;
         *(.data*) 
         *(.rodata*)
@@ -30,9 +30,9 @@ SECTIONS {
     } > RAM
 
     .stack (NOLOAD) : {
-        . = ALIGN(16);
+        . = ALIGN(4);
         _stack_bottom = .;
-        . = . + 8192;
+        . = . + 512;
         _stack_top = .;
     } > RAM
 }

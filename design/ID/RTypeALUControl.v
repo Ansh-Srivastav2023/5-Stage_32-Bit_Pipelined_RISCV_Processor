@@ -1,6 +1,5 @@
-// Decodes funct3 and funct7 for R-Type instructions, including M-extension.
 `default_nettype wire
-`timescale 1ns/1ps
+`timescale 1ns/1ns
 
 module RTypeALUControl(
     input [6:0] funct7,     

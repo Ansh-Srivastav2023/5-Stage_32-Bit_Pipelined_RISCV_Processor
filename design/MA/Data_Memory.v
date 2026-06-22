@@ -1,5 +1,5 @@
 `default_nettype wire
-`timescale 1ns/1ps
+`timescale 1ns/1ns
 
 module Data_Memory (
     input clk,
@@ -8,7 +8,7 @@ module Data_Memory (
     input [31:0] MemWriteData,
     input [7:0] Rx_Data,
     input [31:0] ALUresult,
-    input [31:0] PC,
+    input [31:2] PC,
 
     input full_Rx, empty_Rx,
 
@@ -109,6 +109,9 @@ module Data_Memory (
     // $readmemh("instr_mem.mem", main_ram, 0);
     $readmemh("data_mem.mem", main_ram, 512);
 
+    // $readmemh("/media/anx/New_Volume/Importants/Verilog/open_sta/design/MA/bootloader_rom.mex", boot_rom);
+    // $readmemh("/media/anx/New_Volume/Importants/Verilog/open_sta/design/MA/instr_mem.mex", main_ram, 0);
+    // $readmemh("/media/anx/New_Volume/Importants/Verilog/open_sta/design/MA/data_mem.mex", main_ram, 512);
   end
 
 endmodule

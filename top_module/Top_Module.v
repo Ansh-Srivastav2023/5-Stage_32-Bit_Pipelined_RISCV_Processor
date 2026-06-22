@@ -315,7 +315,8 @@ module Top_Module (
 
 
     UART_addr_sel UART_addr_sel (.ALUresult(ALUresult_EX),
-                                .MemWrite(Mem_Con_EX[1]), .rst(rst),
+                                .MemWrite(Mem_Con_EX[1]), 
+                                .rst(rst),
                                 .UART_Mem_wt(UART_Mem_wt),
                                 .IO_OUT_temp(data2_EX[15:0]),
                                 .IO_OUT(IO_OUT));

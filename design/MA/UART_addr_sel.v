@@ -1,9 +1,9 @@
 `default_nettype wire
-`timescale 1ns/1ps
+`timescale 1ns/1ns
 
 module UART_addr_sel (
     input [31:0] ALUresult,
-    input MemWrite,
+    input MemWrite, rst,
     input [15:0] IO_OUT_temp,
     output reg [15:0] IO_OUT,
 
@@ -17,8 +17,9 @@ module UART_addr_sel (
 
     assign IO_OUT_latch_select = (UART_Mem_wt == 2'b11) ? 1'b1 : 1'b0;
 
-    always @(posedge IO_OUT_latch_select) begin
-        IO_OUT <= IO_OUT_temp;
+    always @(posedge IO_OUT_latch_select or negedge rst) begin
+        if(!rst) IO_OUT <= 0;
+        else IO_OUT <= IO_OUT_temp;
     end
 
     always @(*) begin

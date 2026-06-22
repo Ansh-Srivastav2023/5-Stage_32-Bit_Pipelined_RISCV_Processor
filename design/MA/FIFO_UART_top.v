@@ -1,5 +1,5 @@
 `default_nettype wire
-`timescale 1ns/1ps
+`timescale 1ns/1ns
 
 module FIFO_UART_top(
     input clk, rst,
@@ -13,8 +13,8 @@ module FIFO_UART_top(
     output [7:0] FIFO_Rx_Dout
 );
 
-    wire Tx_Active;
-    wire Tx_Done, Rx_Done, full_Tx, empty_Tx;
+    // wire Tx_Active;
+    wire Tx_Done, Rx_Done, empty_Tx;
     wire [7:0] FIFO_Tx_Dout, Rx_Data;
 
     FIFO_Tx fifo_tx  (.clk(clk), .rst(rst), 
@@ -22,7 +22,6 @@ module FIFO_UART_top(
                     .write_en(write_en), 
                     .read_en(Tx_Done), 
                     .data_out(FIFO_Tx_Dout), 
-                    .full(full_Tx), 
                     .empty(empty_Tx));
     
     
@@ -40,7 +39,7 @@ module FIFO_UART_top(
                 .Tx_Drive(~empty_Tx), 
                 .Tx_Data(FIFO_Tx_Dout),
                 .Tx_Serial(Tx_Serial),
-                .Tx_Active(Tx_Active),
+                // .Tx_Active(Tx_Active),
                 .Tx_Done(Tx_Done),
 
                 .Rx_Serial(Rx_Serial),

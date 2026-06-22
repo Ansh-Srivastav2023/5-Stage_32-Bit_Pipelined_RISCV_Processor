@@ -1,14 +1,11 @@
 `default_nettype wire
-`timescale 1ns/1ps
+`timescale 1ns/1ns
 
 module Control_Unit(
     input  [6:0] opcode,
     input  [2:0] funct3,
     input  [6:0] funct7,
-    input        rst,
-
     output reg        RegWrite,
-    output reg        RegRead,
     output reg        MemWrite,
     output reg        MemRead,
     output reg        ALUSrc,
@@ -35,7 +32,6 @@ module Control_Unit(
 
     // ================= DEFAULTS =================
     RegWrite    = 1'b0;
-    RegRead     = 1'b0;
     MemWrite    = 1'b0;
     MemRead     = 1'b0;
     ALUSrc      = 1'b0;
@@ -54,7 +50,6 @@ module Control_Unit(
       7'b0110011:
       begin
         RegWrite   = 1'b1;
-        RegRead    = 1'b1;
         ALUControl = r_type_ALUControl;
       end
 
@@ -62,7 +57,6 @@ module Control_Unit(
       7'b0000011:
       begin
         RegWrite   = 1'b1;
-        RegRead    = 1'b1;
         MemRead    = 1'b1;
         ALUSrc     = 1'b1;
         ResultSrc  = 2'b01;
@@ -72,7 +66,6 @@ module Control_Unit(
       7'b0010011:
       begin
         RegWrite   = 1'b1;
-        RegRead    = 1'b1;
         ALUSrc     = 1'b1;
 
         case (funct3)
@@ -116,7 +109,6 @@ module Control_Unit(
       7'b0100011:
       begin
         MemWrite = 1'b1;
-        RegRead  = 1'b1;
         ALUSrc   = 1'b1;
         ImmType  = 3'b001;
       end
@@ -125,7 +117,6 @@ module Control_Unit(
       7'b1100011:
       begin
         Branch  = 1'b1;
-        RegRead = 1'b1;
         ImmType = 3'b010;
 
         case (funct3)
@@ -168,7 +159,6 @@ module Control_Unit(
       7'b0110111:
       begin
         RegWrite    = 1'b1;
-        RegRead     = 1'b1;
         ALUSrc      = 1'b1;
         ImmType     = 3'b011;
         isPC_select = 2'b10;
@@ -178,7 +168,6 @@ module Control_Unit(
       7'b0010111:
       begin
         RegWrite    = 1'b1;
-        RegRead     = 1'b1;
         ALUSrc      = 1'b1;
         ImmType     = 3'b011;
         Branch      = 1'b1;
@@ -198,7 +187,6 @@ module Control_Unit(
       7'b1100111:
       begin
         RegWrite   = 1'b1;
-        RegRead    = 1'b1;
         JumpReg    = 1'b1;
         ALUSrc     = 1'b1;
         ResultSrc  = 2'b10;
@@ -208,7 +196,6 @@ module Control_Unit(
       default:
       begin
         RegWrite    = 1'b0;
-        RegRead     = 1'b0;
         MemWrite    = 1'b0;
         MemRead     = 1'b0;
         ALUSrc      = 1'b0;

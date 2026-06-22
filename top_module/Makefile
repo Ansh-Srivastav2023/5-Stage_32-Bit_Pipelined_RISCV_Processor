@@ -29,8 +29,6 @@ TB       = $(RTL_DIR)/Testbench.v
 SIMV     = $(RTL_DIR)/simv
 SIM_OUT  = $(RTL_DIR)/sim_output.txt
 
-IVERILOG ?= iverilog
-VVP      ?= vvp
 
 
 CFLAGS  = $(ARCHFLAGS) -O2 -Wall -Wextra -ffreestanding \

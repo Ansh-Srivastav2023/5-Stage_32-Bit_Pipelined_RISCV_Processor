@@ -1,5 +1,5 @@
 `default_nettype wire
-`timescale 1ns/1ps
+`timescale 1ns/1ns
 
 module Forwarding_Block (EX_MEM_RegWrite, MEM_WB_RegWrite, ID_EX_rs1, ID_EX_rs2, EX_MEM_rd, MEM_WB_rd, ForwardA, ForwardB);
 

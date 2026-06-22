@@ -1,5 +1,5 @@
 `default_nettype wire
-`timescale 1ns/1ns
+`timescale 1ns/1ps
 
 module PC(PC_next, clk, rst, PC, PCWrite);
 
