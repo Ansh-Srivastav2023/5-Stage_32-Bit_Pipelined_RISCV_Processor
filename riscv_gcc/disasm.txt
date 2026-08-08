@@ -2,19 +2,39 @@
 /media/anx/New_Volume/Importants/Verilog/Pipelined_Processor/riscv_gcc/tst.elf:     file format elf32-littleriscv
 
 
-Disassembly of section .init:
-
-20000000 <_start>:
-20000000:	20001137          	lui	sp,0x20001
-20000004:	008000ef          	jal	2000000c <main>
-
-20000008 <trap>:
-20000008:	0000006f          	j	20000008 <trap>
-
 Disassembly of section .text:
 
-2000000c <main>:
-2000000c:	900007b7          	lui	a5,0x90000
-20000010:	02d00713          	li	a4,45
-20000014:	00e7a023          	sw	a4,0(a5) # 90000000 <_stack_top+0x6ffff600>
-20000018:	00008067          	ret
+20000000 <_start>:
+20000000:	10001197          	auipc	gp,0x10001
+20000004:	80018193          	addi	gp,gp,-2048 # 30000800 <__global_pointer$>
+20000008:	30400137          	lui	sp,0x30400
+2000000c:	008000ef          	jal	ra,20000014 <main>
+
+20000010 <trap>:
+20000010:	0000006f          	jal	zero,20000010 <trap>
+
+20000014 <main>:
+20000014:	30000637          	lui	a2,0x30000
+20000018:	001675b7          	lui	a1,0x167
+2000001c:	00060613          	addi	a2,a2,0 # 30000000 <pixel_data>
+20000020:	a7858593          	addi	a1,a1,-1416 # 166a78 <_start-0x1fe99588>
+20000024:	00b605b3          	add	a1,a2,a1
+20000028:	90000537          	lui	a0,0x90000
+2000002c:	00062703          	lw	a4,0(a2)
+20000030:	00460613          	addi	a2,a2,4
+20000034:	01075793          	srli	a5,a4,0x10
+20000038:	00875693          	srli	a3,a4,0x8
+2000003c:	fff7c793          	xori	a5,a5,-1
+20000040:	fff6c693          	xori	a3,a3,-1
+20000044:	0ff7f793          	andi	a5,a5,255
+20000048:	0ff6f693          	andi	a3,a3,255
+2000004c:	01079793          	slli	a5,a5,0x10
+20000050:	00869693          	slli	a3,a3,0x8
+20000054:	fff74713          	xori	a4,a4,-1
+20000058:	00d7e7b3          	or	a5,a5,a3
+2000005c:	0ff77713          	andi	a4,a4,255
+20000060:	00e7e7b3          	or	a5,a5,a4
+20000064:	00f52023          	sw	a5,0(a0) # 90000000 <_stack_top+0x5fc00000>
+20000068:	fcb612e3          	bne	a2,a1,2000002c <main+0x18>
+2000006c:	00000513          	addi	a0,zero,0
+20000070:	00008067          	jalr	zero,0(ra)

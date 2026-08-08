@@ -8,7 +8,7 @@ module Top_Module (
     input  Rx_Serial,
     output Carry,
     output Tx_Serial, 
-    output [15:0] IO_OUT
+    output [31:0] IO_OUT
 );
 
     wire rst;
@@ -24,7 +24,7 @@ module Top_Module (
         
     wire [31:0] MemReadData;
     
-    wire [31:0] PC_IF, instruction_IF;
+    wire [31:0] PC_IF, instruction_IF, instruction_ID, instruction_EX;
 
     wire RegWrite_ID, is_compressed, stall, mul_active, div_active;
     wire [1:0] Mem_Con_ID, ForwardA, ForwardB, isPC_select, isPC_select_ID;
@@ -46,6 +46,8 @@ module Top_Module (
 
     wire [7:0] FIFO_Rx_Dout;
     wire Rx_read_en, full_Rx, empty_Rx;
+
+    wire [2:0] funct3_EX, funct3_ID, funct3;
 
 
     Reset_Sync Reset_Sync(.async_rst(async_rst), .clk(clk), .sync_rst(rst));
@@ -130,8 +132,12 @@ module Top_Module (
         .clk(clk), 
         .rst(rst), 
         .data1(data1), 
-        .data2(data2), 
+        .data2(data2),
+        .funct3(instruction_IF[14:12]),
+        .funct3_ID(funct3_ID),
         .ImmExt(ImmExt), 
+        .instruction_IF(instruction_IF),
+        .instruction_ID(instruction_ID),
         .PC(PC_IF), 
         .RegWrite(RegWriteHZ), 
         .Mem_Con({MemWriteHZ, MemReadHZ}), 
@@ -197,7 +203,11 @@ module Top_Module (
                 .clk(clk), 
                 .rst(rst), 
                 .ALUresult(ALUresult), 
+                .instruction_ID(instruction_ID),
+                .instruction_EX(instruction_EX),
                 .data2(rdB_ForwB), 
+                .funct3_ID(funct3_ID),
+                .funct3_EX(funct3_EX),
                 .rd_ID_EX(rd_ID), 
                 .RegWrite(RegWrite_ID), 
                 .Mem_Con(Mem_Con_ID), 
@@ -226,7 +236,8 @@ module Top_Module (
                 .MemWriteData(data2_EX), 
                 .Rx_Data(FIFO_Rx_Dout),
                 .ALUresult(ALUresult_EX), 
-                .PC(PC[31:2]),
+                .PC(PC),
+                .funct3_st_ld(funct3_EX),
                 .full_Rx(full_Rx),
                 .empty_Rx(empty_Rx),
                 .Rx_read_en(Rx_read_en),
@@ -317,8 +328,8 @@ module Top_Module (
     UART_addr_sel UART_addr_sel (.ALUresult(ALUresult_EX),
                                 .MemWrite(Mem_Con_EX[1]), 
                                 .rst(rst),
+                                .IO_OUT_temp(data2_EX),
                                 .UART_Mem_wt(UART_Mem_wt),
-                                .IO_OUT_temp(data2_EX[15:0]),
                                 .IO_OUT(IO_OUT));
 
     FIFO_UART_top fifo_uart    (.clk(clk), .rst(rst), 

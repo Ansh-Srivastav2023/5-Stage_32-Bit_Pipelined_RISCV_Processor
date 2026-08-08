@@ -49,7 +49,7 @@ $(ELF): $(OBJ) $(GCC_DIR)/link.ld
 	@ $(SIZE) $@
 
 $(DISASM): $(ELF)
-	@ $(OBJDUMP) -d -S $< > $@
+	@ $(OBJDUMP) -d -M no-aliases -S $< > $@
 
 $(BIN): $(ELF)
 	@ $(OBJCOPY) -O binary $< $@
@@ -66,30 +66,46 @@ $(IMEM_HEX): $(ELF)
 	
 # 	@echo "@00000000" > $@
 	@echo "" > $@
-	
 	@hexdump -v -e '1/4 "%08x" "\n"' $(GCC_DIR)/imem.bin >> $@
-	
 	@rm -f $(GCC_DIR)/imem.bin
 
 
 $(DMEM_HEX): $(ELF)
-	@echo "Generating Data Memory HEX (32-bit words)..."
+	@echo "Generating Data Memory HEX (4 byte lanes)..."
 	@mkdir -p $(dir $@)
 	
 	@if $(OBJDUMP) -h $< | grep -E "\.data|\.sdata|\.rodata" > /dev/null; then \
 		echo "  > Data sections detected. Extracting..."; \
 		$(OBJCOPY) -O binary \
-			--only-section=.rodata \
 			--only-section=.data \
 			--only-section=.sdata \
+			--only-section=.bss \
 			$< $(GCC_DIR)/dmem.bin; \
-		@ echo "" > $@; \
-# 		@ echo "@0000200" > $@; \
-		hexdump -v -e '1/4 "%08x" "\n"' $(GCC_DIR)/dmem.bin >> $@; \
-		rm -f $(GCC_DIR)/dmem.bin; \
+		echo "  > Splitting into 4 byte-lane files..."; \
+		hexdump -v -e '1/1 "%02x\n"' $(GCC_DIR)/dmem.bin > $(GCC_DIR)/dmem_bytes.txt; \
+		\
+		# FIX: Freshly truncate/wipe files to prevent appending onto old builds \
+		> "$(dir $@)data_mem0.mem"; \
+		> "$(dir $@)data_mem1.mem"; \
+		> "$(dir $@)data_mem2.mem"; \
+		> "$(dir $@)data_mem3.mem"; \
+		\
+		# FIX: Use awk with '>>' stream formatting into the freshly cleared files \
+		awk '\
+		NR%4==1 {print $$1 >> "$(dir $@)data_mem0.mem"} \
+		NR%4==2 {print $$1 >> "$(dir $@)data_mem1.mem"} \
+		NR%4==3 {print $$1 >> "$(dir $@)data_mem2.mem"} \
+		NR%4==0 {print $$1 >> "$(dir $@)data_mem3.mem"}' $(GCC_DIR)/dmem_bytes.txt; \
+		\
+		rm -f $(GCC_DIR)/dmem.bin $(GCC_DIR)/dmem_bytes.txt; \
+		echo "  > Successfully generated data_mem[0-3].mem"; \
 	else \
-		echo "  > No data sections found. Creating empty data_mem.mem"; \
-		touch $@; \
+		echo "  > No data sections found. Overwriting to create empty data_mem files..."; \
+		# FIX: Force clean overwrite/creation if no data section exists \
+		> $(dir $@)data_mem0.mem; \
+		> $(dir $@)data_mem1.mem; \
+		> $(dir $@)data_mem2.mem; \
+		> $(dir $@)data_mem3.mem; \
 	fi
 
 $(GCC_DIR)/%.o: $(GCC_DIR)/%.c

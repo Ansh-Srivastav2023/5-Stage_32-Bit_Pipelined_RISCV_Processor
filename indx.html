@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RISC-V SoC Dev Station</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Monaco Editor Loader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #050811;
+            --border: rgba(255,255,255,0.08);
+            --text: #dbe4f3;
+            --muted: #8a99b5;
+            --blue-1: #3b82f6;
+            --blue-2: #6366f1;
+            --green: #a9dc76;
+            --term-green: #22ff88;
+            --panel-bg: rgba(11,18,32,0.85);
+            --hover-bg: rgba(255, 255, 255, 0.05);
+        }
+        html, body { 
+            height: 100%; 
+            width: 100%; 
+            overflow: hidden; 
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', system-ui, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: -20% -10% 0 -10%;
+            z-index: -2;
+            background:
+                radial-gradient(900px 600px at 12% 8%, rgba(59,130,246,0.18), transparent 60%),
+                radial-gradient(800px 500px at 88% 12%, rgba(168,85,247,0.14), transparent 60%),
+                radial-gradient(700px 500px at 50% 110%, rgba(236,72,153,0.1), transparent 55%);
+        }
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background-image: linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), 
+                              linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+            background-size: 32px 32px;
+            mask-image: radial-gradient(ellipse at center, black 40%, transparent 75%);
+            pointer-events: none;
+        }
+
+        /* Top Bar Layout */
+        .app-header {
+            height: 56px;
+            padding: 0 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(8, 14, 27, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            flex-shrink: 0;
+        }
+        .brand-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .orb {
+            width: 28px; height: 28px; border-radius: 9px;
+            background: linear-gradient(135deg, var(--blue-1), var(--blue-2));
+            box-shadow: 0 0 20px rgba(99,102,241,0.4), inset 0 0 10px rgba(255,255,255,0.15);
+            position: relative;
+            flex: none;
+        }
+        .orb::after {
+            content: "";
+            position: absolute; inset: 2px;
+            border-radius: 7px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0));
+            mix-blend-mode: overlay;
+        }
+        h1 {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            background: linear-gradient(180deg, #fff 0%, #b8c4e0 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .app-subtitle {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--muted);
+            letter-spacing: 0.02em;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+        
+        /* 3-Column Screen Filling Grid Workspace */
+        .workspace {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 260px 1.2fr 0.8fr;
+            gap: 16px;
+            padding: 16px 0px 16px 16px; /* Touch the right edge of the screen completely (0px right padding) */
+            min-height: 0; /* Crucial: lets flex child overflow rules apply */
+        }
+        
+        /* Consistent Container Panels styling */
+        .panel {
+            height: 100%;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.03);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 0;
+        }
+
+        /* Dock the visual sidebar completely flat against the right boundary */
+        .visual-panel .card {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            border-right: none;
+        }
+
+        /* 1. File Explorer Pane styling */
+        .explorer-wrap {
+            height: 100%;
+        }
+        .explorer-header {
+            height: 44px;
+            padding: 0 14px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.02);
+            flex-shrink: 0;
+        }
+        .explorer-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+        }
+        .explorer-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .explorer-btn {
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .explorer-btn:hover {
+            color: white;
+            background: var(--hover-bg);
+        }
+        .explorer-btn svg { width: 15px; height: 15px; }
+
+        .file-tree-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+        }
+        
+        /* Directory Tree Nodes styling */
+        .tree-item { margin-left: 10px; }
+        .tree-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s;
+            color: var(--muted);
+        }
+        .tree-label:hover {
+            background: var(--hover-bg);
+            color: var(--text);
+        }
+        .tree-label.active {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--blue-1);
+            font-weight: 500;
+        }
+        .tree-label svg { width: 14px; height: 14px; flex-shrink: 0; }
+        .tree-children {
+            border-left: 1px solid rgba(255, 255, 255, 0.05);
+            margin-left: 6px;
+            padding-left: 4px;
+        }
+        .hidden { display: none !important; }
+        
+        /* 2. Monaco Editor Container pane */
+        .editor-panel {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        .editor-wrap {
+            flex: 1;
+            min-height: 0;
+        }
+        .editor-header {
+            height: 44px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            background: rgba(255,255,255,0.02);
+            flex-shrink: 0;
+        }
+        .editor-label {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 13px; color: #9fb1d1; font-weight: 500;
+            letter-spacing: .02em;
+        }
+        .dot { 
+            width: 8px; height: 8px; border-radius: 50%; 
+            background: #38bdf8; 
+            box-shadow: 0 0 10px rgba(56,189,248,.7); 
+        }
+        .dot.dirty {
+            background: #ffbd2e;
+            box-shadow: 0 0 10px rgba(255, 189, 46, 0.7);
+        }
+        #editor-container {
+            flex: 1;
+            width: 100%;
+            min-height: 0;
+        }
+        .save-indicator-btn {
+            background: var(--blue-1);
+            border: none;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .save-indicator-btn:hover { background: var(--blue-2); }
+        .save-indicator-btn.clean {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            pointer-events: none;
+        }
+
+        .btn-group {
+            display: flex; flex-wrap: wrap; gap: 10px;
+            margin-top: 12px;
+            flex-shrink: 0;
+        }
+        button {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 9px 16px;
+            border-radius: 999px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600; font-size: 13px;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            transition: transform .15s ease, box-shadow .2s ease, filter .2s ease;
+            background: #1a2233;
+        }
+        button svg { width: 14px; height: 14px; flex: none; }
+        button.primary {
+            background: linear-gradient(135deg, var(--blue-1), var(--blue-2));
+            box-shadow: 0 6px 18px -6px rgba(59,130,246,0.6);
+            border: none;
+        }
+        button.secondary {
+            background: linear-gradient(135deg, #2a344a, #1e2636);
+            box-shadow: 0 4px 12px -6px rgba(0,0,0,0.6);
+        }
+        button:hover { transform: translateY(-1.5px); filter: brightness(1.08); }
+        
+        /* 3. Interactive Tabbed Workspace Panel (Console / Images etc) */
+        .tab-box {
+            height: 100%;
+        }
+        .tab-headers {
+            display: flex;
+            background: rgba(255,255,255,0.02);
+            border-bottom: 1px solid var(--border);
+            padding: 0 10px;
+            flex-shrink: 0;
+            overflow-x: auto;
+        }
+        .tab-btn {
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            padding: 12px 14px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 0;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .tab-btn:hover {
+            color: var(--text);
+            transform: none;
+            filter: none;
+        }
+        .tab-btn.active {
+            color: var(--blue-1);
+            border-bottom-color: var(--blue-1);
+        }
+        .tab-content {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            min-height: 0;
+        }
+        .tab-pane {
+            display: none;
+            height: 100%;
+            overflow-y: auto;
+            padding: 16px;
+        }
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* Pane 1: Terminal Style */
+        #terminal {
+            height: 100%;
+            background: #020206;
+            color: var(--term-green);
+            font-family: 'JetBrains Mono', ui-monospace, monospace;
+            font-size: 12.5px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            overflow-y: auto;
+            padding: 16px;
+            box-shadow: inset 0 0 30px rgba(34,255,136,0.02);
+        }
+
+        /* Pane 2: Image Pipeline Processing Workspace (VERTICAL STACKED CONFIGURATION) */
+        .image-workspace {
+            display: grid;
+            grid-template-rows: 1fr 1fr; /* Two equal rows vertical split */
+            grid-template-columns: 1fr;   /* Single horizontal column */
+            gap: 12px;
+            height: 100%;
+            min-height: 0;
+        }
+        .img-card {
+            background: rgba(0,0,0,0.25);
+            border: 1px dashed var(--border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            position: relative;
+            height: 100%;
+            min-height: 0;
+        }
+        .img-card h4 {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            margin-bottom: 6px;
+            flex-shrink: 0;
+        }
+        .img-frame {
+            flex: 1;
+            width: 100%;
+            min-height: 0;
+            object-fit: contain;
+            border-radius: 8px;
+            background: #000;
+            border: 1px solid var(--border);
+        }
+        .file-upload-lbl {
+            background: #1a2233;
+            border: 1px solid var(--border);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 6px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .file-upload-lbl:hover { background: var(--blue-1); }
+        #imageFile { display: none; }
+
+        /* Pane 3: Assembler Disassembly Viewer */
+        #disasm-view {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #c594e2;
+            white-space: pre;
+            line-height: 1.5;
+            background: #040813;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-y: auto;
+            height: 100%;
+            border: 1px solid var(--border);
+        }
+
+        /* Pane 4: Virtual HW Panel */
+        .virtual-hw-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            height: 100%;
+            justify-content: center;
+        }
+        .hw-module {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+        }
+        .hw-module-title {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+        }
+        .seven-segment-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+        .seven-segment {
+            background: #000;
+            border: 2px solid #222;
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: #ef4444;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
+            text-shadow: 0 0 10px rgba(239,68,68,0.8);
+        }
+        .led-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .led-node {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #1e293b;
+            border: 2px solid #0f172a;
+            transition: all 0.2s ease;
+        }
+        .led-node.active {
+            background: #10b981;
+            box-shadow: 0 0 10px #10b981;
+        }
+
+        /* Overlay Dialog Modals styling */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-card {
+            background: #0b1220;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            width: 380px;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+        }
+        .modal-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .modal-input {
+            width: 100%;
+            background: #161f30;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: white;
+            padding: 8px 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13.5px;
+            outline: none;
+            margin-bottom: 14px;
+        }
+        .modal-input:focus { border-color: var(--blue-1); }
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .modal-btn {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .modal-btn.cancel {
+            background: #1e2636;
+            color: var(--muted);
+            border-color: var(--border);
+        }
+        .modal-btn.confirm {
+            background: var(--blue-1);
+            color: white;
+        }
+
+        /* Elegant Toast Banner system */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #0b1220;
+            border: 1px solid var(--blue-1);
+            color: var(--text);
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 9999;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(100px);
+            opacity: 0;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        @media (max-width: 1100px) {
+            .workspace { 
+                grid-template-columns: 200px 1fr; 
+                grid-template-rows: 1fr 1fr;
+                padding-right: 16px; /* Restore padding on small stacked layout views */
+            }
+            .visual-panel { grid-column: span 2; }
+            .visual-panel .card {
+                border-top-right-radius: 12px;
+                border-bottom-right-radius: 12px;
+                border-right: 1px solid var(--border);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Application Header Bar -->
+<header class="app-header">
+    <div class="brand-wrapper">
+        <div class="orb" aria-hidden="true"></div>
+        <h1>RISC-V SoC Dev Station</h1>
+    </div>
+    <div class="app-subtitle">RISC-V Custom Processor Interface</div>
+</header>
+
+<!-- Main screen filling Grid Area -->
+<div class="workspace">
+    
+    <!-- PANEL 1: File Explorer -->
+    <div class="panel explorer-panel">
+        <div class="card explorer-wrap">
+            <div class="explorer-header">
+                <span class="explorer-title">Workspace</span>
+                <div class="explorer-actions">
+                    <button class="explorer-btn" onclick="openNewFileDialog()" title="New File">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+                    </button>
+                    <button class="explorer-btn" onclick="loadFileTree()" title="Refresh Tree">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 1 1 21.2 8H17"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="file-tree-container" id="file-tree">
+                <div style="color:var(--muted); padding:10px; font-size:12px;">Connecting to workspace...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANEL 2: Monaco Code Editor -->
+    <div class="panel editor-panel">
+        <div class="card editor-wrap">
+            <div class="editor-header">
+                <div class="editor-label">
+                    <span class="dot" id="dirty-dot"></span>
+                    <span id="current-file-label">riscv_gcc/tst.c</span>
+                </div>
+                <button class="save-indicator-btn clean" id="save-btn" onclick="saveCurrentFile()">Saved</button>
+            </div>
+            <div id="editor-container"></div>
+        </div>
+        <div class="btn-group">
+            <button class="primary" onclick="triggerEndpoint('simulate')">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                <span>Run Simulation</span>
+            </button>
+            <button class="secondary" onclick="triggerEndpoint('process-image')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                <span>Run Image Pipeline</span>
+            </button>
+            <button class="secondary" onclick="triggerEndpoint('clean')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
+                <span>Clean</span>
+            </button>
+            <button class="secondary" onclick="triggerEndpoint('clean_all')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6"/></svg>
+                <span>Clean All</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- PANEL 3: Tabbed consoles / logs visualisations (Completely flush on the right hand side) -->
+    <div class="panel visual-panel">
+        <div class="card tab-box">
+            <div class="tab-headers">
+                <button class="tab-btn active" onclick="switchTab('terminal-pane', this)">Terminal</button>
+                <button class="tab-btn" onclick="switchTab('image-pane', this)">Image Workspace</button>
+                <button class="tab-btn" onclick="switchTab('disasm-pane', this); getAssemblyCode();">Disassembler</button>
+                <button class="tab-btn" onclick="switchTab('hw-pane', this)">Virtual Board</button>
+            </div>
+            
+            <div class="tab-content">
+                <!-- Tab 1: Terminal Console Logs -->
+                <div id="terminal-pane" class="tab-pane active" style="padding: 0;">
+                    <div id="terminal">Console ready...</div>
+                </div>
+                
+                <!-- Tab 2: Visual Image Processing Playground (Vertically Stacked) -->
+                <div id="image-pane" class="tab-pane">
+                    <div class="image-workspace">
+                        <div class="img-card">
+                            <h4>Input Image</h4>
+                            <img id="inputImgPreview" class="img-frame" src="http://127.0.0.1:8000/image/input.png" alt="No input source found" onerror="this.src='https://placehold.co/300x200/111827/a9dc76?text=No+Input+PNG';"/>
+                            <label for="imageFile" class="file-upload-lbl">Upload New PNG</label>
+                            <input type="file" id="imageFile" accept="image/png" onchange="uploadImage(this)">
+                        </div>
+                        <div class="img-card">
+                            <h4>Processed Output</h4>
+                            <img id="outputImgPreview" class="img-frame" src="http://127.0.0.1:8000/image/processed_image.png" alt="Not generated yet" onerror="this.src='https://placehold.co/300x200/111827/3b82f6?text=No+Output+Generated';"/>
+                            <button class="file-upload-lbl" style="border:none; margin-top:6px;" onclick="refreshImages()">Refresh View</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Assembly Disassembly Inspector -->
+                <div id="disasm-pane" class="tab-pane">
+                    <div id="disasm-view">Click 'Disassembler' tab to load file data.</div>
+                </div>
+
+                <!-- Tab 4: Virtual Hardware Board mapping values -->
+                <div id="hw-pane" class="tab-pane">
+                    <div class="virtual-hw-grid">
+                        <div class="hw-module">
+                            <div class="hw-module-title">Memory Mapped Address: 0x90000000 (Last Value)</div>
+                            <div class="seven-segment-container">
+                                <div class="seven-segment" id="segVal">00000000</div>
+                            </div>
+                        </div>
+                        <div class="hw-module">
+                            <div class="hw-module-title">Output Port LEDs (Lower Byte)</div>
+                            <div class="led-row" id="ledRow">
+                                <div class="led-node" title="Bit 7"></div>
+                                <div class="led-node" title="Bit 6"></div>
+                                <div class="led-node" title="Bit 5"></div>
+                                <div class="led-node" title="Bit 4"></div>
+                                <div class="led-node" title="Bit 3"></div>
+                                <div class="led-node" title="Bit 2"></div>
+                                <div class="led-node" title="Bit 1"></div>
+                                <div class="led-node" title="Bit 0"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Overlay Modal for Creating Files -->
+<div id="new-file-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+        <div class="modal-title" id="modal-title-text">Create New File</div>
+        <input type="text" id="modal-file-path" class="modal-input" placeholder="e.g. riscv_gcc/firmware_v2.c">
+        <div class="modal-actions">
+            <button class="modal-btn cancel" onclick="closeNewFileDialog()">Cancel</button>
+            <button class="modal-btn confirm" onclick="submitNewFile()">Create</button>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Toast Message -->
+<div id="toast-notify" class="toast">
+    <span id="toast-text"></span>
+</div>
+
+<script>
+    let editor;
+    let currentFilePath = "riscv_gcc/tst.c";
+    let isEditorDirty = false;
+
+    // Load Monaco editor inside HTML
+    require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs' } });
+    require(['vs/editor/editor.main'], function() {
+        editor = monaco.editor.create(document.getElementById('editor-container'), {
+            value: "",
+            language: 'c',
+            theme: 'vs-dark',
+            fontSize: 14,
+            automaticLayout: true,
+            scrollbar: { vertical: 'auto', horizontal: 'auto' },
+            minimap: { enabled: false }
+        });
+
+        // Event listener to check for modification state changes
+        editor.onDidChangeModelContent(() => {
+            if (!isEditorDirty) {
+                setEditorDirtyState(true);
+            }
+        });
+
+        // Load default file on initial startup
+        openFile(currentFilePath);
+    });
+
+    // Elegant non-blocking Notification Banner (No alert() used)
+    function showNotification(message, type = 'info') {
+        const toast = document.getElementById('toast-notify');
+        const text = document.getElementById('toast-text');
+        text.innerText = message;
+        
+        if (type === 'error') {
+            toast.style.borderColor = '#ef4444';
+        } else if (type === 'success') {
+            toast.style.borderColor = '#10b981';
+        } else {
+            toast.style.borderColor = 'var(--blue-1)';
+        }
+        
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 4000);
+    }
+
+    // Handles Save button changes (Clean/Modified)
+    function setEditorDirtyState(isDirty) {
+        isEditorDirty = isDirty;
+        const saveBtn = document.getElementById('save-btn');
+        const dirtyDot = document.getElementById('dirty-dot');
+        
+        if (isDirty) {
+            saveBtn.innerText = "Save File";
+            saveBtn.classList.remove('clean');
+            dirtyDot.classList.add('dirty');
+        } else {
+            saveBtn.innerText = "Saved";
+            saveBtn.classList.add('clean');
+            dirtyDot.classList.remove('dirty');
+        }
+    }
+
+    // List and recursive render of Workspace Files Tree
+    async function loadFileTree() {
+        const container = document.getElementById('file-tree');
+        try {
+            const response = await fetch('http://127.0.0.1:8000/files');
+            if (!response.ok) throw new Error("Could not fetch file structure");
+            const data = await response.json();
+            renderFileTree(data.files, container);
+        } catch (err) {
+            container.innerHTML = `<div style="color:#ef4444; padding:10px;">Connection failed: ${err.message}</div>`;
+        }
+    }
+
+    // Recursively construct HTML element nodes for directory structure
+    function renderFileTree(nodes, container) {
+        container.innerHTML = '';
+        if (!nodes || nodes.length === 0) {
+            container.innerHTML = `<div style="color:var(--muted); padding:10px;">Directory empty</div>`;
+            return;
+        }
+
+        function buildDOM(items, parentEl) {
+            items.forEach(item => {
+                const itemEl = document.createElement('div');
+                itemEl.className = `tree-item ${item.type}`;
+                
+                const labelEl = document.createElement('div');
+                labelEl.className = 'tree-label';
+                if (item.path === currentFilePath) {
+                    labelEl.classList.add('active');
+                }
+                
+                // SVG Folders or Files Icon definitions
+                const iconSVG = item.type === 'directory' 
+                    ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`
+                    : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+                
+                labelEl.innerHTML = `${iconSVG}<span>${item.name}</span>`;
+                itemEl.appendChild(labelEl);
+                
+                if (item.type === 'directory') {
+                    const childrenContainer = document.createElement('div');
+                    childrenContainer.className = 'tree-children hidden';
+                    itemEl.appendChild(childrenContainer);
+                    
+                    labelEl.onclick = (e) => {
+                        e.stopPropagation();
+                        childrenContainer.classList.toggle('hidden');
+                    };
+                    
+                    if (item.children && item.children.length > 0) {
+                        buildDOM(item.children, childrenContainer);
+                    }
+                } else {
+                    labelEl.onclick = (e) => {
+                        e.stopPropagation();
+                        document.querySelectorAll('.tree-label').forEach(el => el.classList.remove('active'));
+                        labelEl.classList.add('active');
+                        openFile(item.path);
+                    };
+                }
+                parentEl.appendChild(itemEl);
+            });
+        }
+        buildDOM(nodes, container);
+    }
+
+    // Pull contents of requested relative file path and load into Monaco
+    async function openFile(path) {
+        if (isEditorDirty) {
+            const confirmAbandon = confirm(`Abandon unsaved changes in ${currentFilePath}?`);
+            if (!confirmAbandon) return;
+        }
+
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/file?path=${encodeURIComponent(path)}`);
+            if (!response.ok) throw new Error("Could not open target file contents.");
+            const data = await response.json();
+            
+            currentFilePath = path;
+            document.getElementById('current-file-label').innerText = path;
+            
+            if (editor) {
+                editor.setValue(data.content);
+                
+                // Infer Language Syntax Model mapping for Monaco
+                const ext = path.split('.').pop().toLowerCase();
+                let monacoLang = 'plaintext';
+                if (ext === 'c' || ext === 'h') monacoLang = 'c';
+                else if (ext === 's' || ext === 'asm') monacoLang = 'assembly';
+                else if (ext === 'py') monacoLang = 'python';
+                else if (ext === 'sh') monacoLang = 'shell';
+                else if (ext === 'v' || ext === 'sv') monacoLang = 'systemverilog';
+                else if (ext === 'json') monacoLang = 'json';
+                else if (ext === 'html') monacoLang = 'html';
+                
+                monaco.editor.setModelLanguage(editor.getModel(), monacoLang);
+            }
+            
+            setEditorDirtyState(false);
+            showNotification(`Opened: ${path}`, 'info');
+        } catch (err) {
+            showNotification(`Error: ${err.message}`, 'error');
+        }
+    }
+
+    // Save active editor contents back to the workspace
+    async function saveCurrentFile() {
+        if (!editor) return;
+        const fileContent = editor.getValue();
+        
+        try {
+            const response = await fetch('http://127.0.0.1:8000/file', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ path: currentFilePath, content: fileContent })
+            });
+            const data = await response.json();
+            if (data.status === 'success') {
+                setEditorDirtyState(false);
+                showNotification(`Saved: ${currentFilePath}`, 'success');
+                // Log action in output terminal
+                document.getElementById('terminal').innerText += `\n[SYSTEM] Successfully saved modifications to ${currentFilePath}\n`;
+            } else {
+                throw new Error(data.detail || "Save failed");
+            }
+        } catch (err) {
+            showNotification(`Save Error: ${err.message}`, 'error');
+        }
+    }
+
+    // Modal dialog controls for establishing new workspace assets
+    function openNewFileDialog() {
+        document.getElementById('modal-file-path').value = '';
+        document.getElementById('new-file-modal').classList.remove('hidden');
+    }
+
+    // Close Dialog Modal
+    function closeNewFileDialog() {
+        document.getElementById('new-file-modal').classList.add('hidden');
+    }
+
+    // Submit and Create New File
+    async function submitNewFile() {
+        const path = document.getElementById('modal-file-path').value.trim();
+        if (!path) {
+            showNotification("Please provide a path for the new file", "error");
+            return;
+        }
+
+        try {
+            const response = await fetch('http://127.0.0.1:8000/file', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ path: path, content: "" })
+            });
+            const data = await response.json();
+            if (data.status === 'success') {
+                showNotification(`Created file: ${path}`, 'success');
+                closeNewFileDialog();
+                await loadFileTree();
+                await openFile(path);
+            } else {
+                throw new Error(data.detail);
+            }
+        } catch (err) {
+            showNotification(`Error: ${err.message}`, 'error');
+        }
+    }
+
+    // Keyboard bindings for Ctrl+S Save triggers
+    window.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+            e.preventDefault();
+            saveCurrentFile();
+        }
+    });
+
+    // Handle interactive workspace tab panels switching
+    function switchTab(paneId, btnEl) {
+        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        
+        document.getElementById(paneId).classList.add('active');
+        btnEl.classList.add('active');
+    }
+
+    // Query disassembly dumps mapping
+    async function getAssemblyCode() {
+        const view = document.getElementById('disasm-view');
+        view.innerText = "Loading disassembly trace disasm.txt...";
+        try {
+            const response = await fetch('http://127.0.0.1:8000/disassembly');
+            const data = await response.json();
+            view.innerText = data.assembly || "Empty disassembly data found.";
+        } catch (err) {
+            view.innerText = `[ERROR] Failed to query workspace assembly: ${err.message}`;
+        }
+    }
+
+    // Image assets fetch helper
+    function refreshImages() {
+        const hash = new Date().getTime();
+        document.getElementById('inputImgPreview').src = `http://127.0.0.1:8000/image/input.png?cb=${hash}`;
+        document.getElementById('outputImgPreview').src = `http://127.0.0.1:8000/image/processed_image.png?cb=${hash}`;
+    }
+
+    // File selection pipelines
+    async function uploadImage(input) {
+        if (!input.files || !input.files[0]) return;
+        
+        const file = input.files[0];
+        const formData = new FormData();
+        formData.append("file", file);
+        
+        const terminal = document.getElementById('terminal');
+        terminal.innerText += `\n[WEB] Overwriting image_process/input.png with ${file.name}...\n`;
+
+        try {
+            const response = await fetch('http://127.0.0.1:8000/upload-image', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            terminal.innerText += `[WEB] Image pipeline modified successfully.\n`;
+            refreshImages();
+            showNotification("Image uploaded successfully!", "success");
+        } catch (err) {
+            terminal.innerText += `[WEB ERROR] Upload failed: ${err.message}\n`;
+            showNotification("Upload failed", "error");
+        }
+    }
+
+    // Direct parser to update UI dashboard
+    function updateSimulatedHardware(hexStr) {
+        if (!hexStr) return;
+        let hexValueStr = hexStr.replace('0x', '').trim();
+        
+        // Ensure standard numeric hex verification
+        if (/^[0-9a-fA-F]+$/.test(hexValueStr)) {
+            document.getElementById('segVal').innerText = hexValueStr.toUpperCase().padStart(8, '0');
+            
+            const val = parseInt(hexValueStr, 16);
+            const lowerByte = val & 0xFF;
+            const ledNodes = document.querySelectorAll('#ledRow .led-node');
+            
+            for (let i = 0; i < 8; i++) {
+                const bit = (lowerByte >> (7 - i)) & 1;
+                if (bit === 1) {
+                    ledNodes[i].classList.add('active');
+                } else {
+                    ledNodes[i].classList.remove('active');
+                }
+            }
+        }
+    }
+
+    // Automated backend file verification (Highest Priority Truth Fetch)
+    async function fetchHardwareHexOutputs() {
+        const paths = ['verilator/io_out.hex', 'image_process/io_out.hex'];
+        for (let path of paths) {
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/file?path=${encodeURIComponent(path)}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.content && data.content.trim()) {
+                        const lines = data.content.trim().split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                        if (lines.length > 0) {
+                            const lastLine = lines[lines.length - 1];
+                            updateSimulatedHardware(lastLine);
+                            return true; // Successfully matched, end execution
+                        }
+                    }
+                }
+            } catch (err) {
+                console.warn(`Could not query output file ${path}:`, err);
+            }
+        }
+        return false;
+    }
+
+    // Live state updates mapping terminal prints directly to HW simulated pins
+    function updateHardwareDashboard(logOutput) {
+        let matchedValue = null;
+        
+        // Standard scan for lines with output mapped addresses
+        const lines = logOutput.split('\n');
+        for (let line of lines) {
+            if (line.includes('90000000') || line.toLowerCase().includes('0x90000000')) {
+                // Find potential hex values
+                const hexes = line.match(/0x[0-9a-fA-F]+/g) || line.match(/\b[0-9a-fA-F]{8}\b/g);
+                if (hexes) {
+                    for (let h of hexes) {
+                        if (!h.includes('90000000')) {
+                            matchedValue = h;
+                            break;
+                        }
+                    }
+                }
+                
+                // Fallback: search for other independent integers
+                if (!matchedValue) {
+                    const decs = line.match(/\b\d+\b/g);
+                    if (decs) {
+                        for (let d of decs) {
+                            if (d !== '90000000') {
+                                matchedValue = parseInt(d, 10).toString(16);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // General text-matching fallbacks
+        if (!matchedValue) {
+            const regexes = [
+                /io_out\s*[:=]\s*(0x[0-9a-fA-F]+|[0-9a-fA-F]+)/i,
+                /write\s*(0x[0-9a-fA-F]+|[0-9a-fA-F]+)/i,
+                /out\s*[:=]\s*(0x[0-9a-fA-F]+|[0-9a-fA-F]+)/i,
+                /value\s*[:=]\s*(0x[0-9a-fA-F]+|[0-9a-fA-F]+)/i
+            ];
+            for (let rx of regexes) {
+                const match = logOutput.match(rx);
+                if (match) {
+                    matchedValue = match[1];
+                    break;
+                }
+            }
+        }
+        
+        if (matchedValue) {
+            updateSimulatedHardware(matchedValue);
+        }
+    }
+
+    // Command runner orchestrator
+    async function triggerEndpoint(route) {
+        const terminal = document.getElementById('terminal');
+        
+        // Block simulation start if the user has edits pending unsaved in editor
+        if (route === 'simulate' && isEditorDirty) {
+            showNotification("Please save edits before starting the simulation", "error");
+            return;
+        }
+
+        terminal.innerText = `[WEB] Initializing python automate.py ${route}...\n`;
+
+        try {
+            const options = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            };
+            
+            if (route === 'simulate') {
+                options.body = JSON.stringify({ code: editor ? editor.getValue() : "" });
+            }
+
+            const response = await fetch(`http://127.0.0.1:8000/${route}`, options);
+            const data = await response.json();
+            
+            terminal.innerText = data.output;
+            
+            // Step 1: Attempt to parse output from standard terminal stdout logs
+            updateHardwareDashboard(data.output);
+            
+            // Step 2: Extract real-time hardware synthesis outputs directly from hex file (Robust Override)
+            await fetchHardwareHexOutputs();
+            
+            if (route === 'process-image' || route === 'simulate') {
+                refreshImages();
+            }
+        } catch (err) {
+            terminal.innerText = `[WEB ERROR] Failed to reach backend: ${err.message}`;
+            showNotification("Network simulation connection lost", "error");
+        }
+    }
+
+    // Initial listing bootstrapper
+    window.onload = () => {
+        loadFileTree();
+    };
+</script>
+</body>
+</html>

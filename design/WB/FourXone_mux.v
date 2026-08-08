@@ -8,4 +8,4 @@ module FourXone_mux (A, B, C, sel, Out);
 
     assign Out = (sel == 2'b00) ? A : ((sel == 2'b01) ? B : C);
 
-endmodule //FourXone_mux
+endmodule

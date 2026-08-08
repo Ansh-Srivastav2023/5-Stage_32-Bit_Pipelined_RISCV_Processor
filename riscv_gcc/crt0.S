@@ -1,8 +1,13 @@
 .section .init
-.global _start
+.globl _start
 
 _start:
-    li sp, 0x20001000   
+    .option push
+    .option norelax
+    la gp, __global_pointer$
+    .option pop
+    
+    li sp, 0x30400000   
     jal ra, main        
 
 trap:

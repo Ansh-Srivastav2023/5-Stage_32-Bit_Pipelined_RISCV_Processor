@@ -23,15 +23,20 @@ slang_test:
 
 build:
 	@ echo "Running V E R I L A T O R...."
-	@ verilator --sv --binary --top $(TOP) $(SRC) --trace --quiet
+	@ verilator --sv --binary --top $(TOP) $(SRC) --trace --quiet --Wno-WIDTHEXPAND --Wno-WIDTHTRUNC
 	@ cp $(MEM) ./
 
 run:
 	@./obj_dir/V$(TOP) +trace --quiet
 
 
+clean_all:
+	rm -rf obj_dir logs *.log
+	clear
+
+
 clean:
-	rm -rf logs *.log *.mem
+	rm -rf logs *.log
 	clear
 
 
@@ -48,3 +53,5 @@ clean:
 # 	./obj_dir/V$(TOP)
 
 ##################################################################
+
+

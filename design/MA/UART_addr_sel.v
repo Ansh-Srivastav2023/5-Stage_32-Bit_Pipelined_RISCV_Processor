@@ -4,9 +4,9 @@
 module UART_addr_sel (
     input [31:0] ALUresult,
     input MemWrite, rst,
-    input [15:0] IO_OUT_temp,
-    output reg [15:0] IO_OUT,
-
+    input [31:0] IO_OUT_temp,
+    
+    output reg [31:0] IO_OUT,
     output reg [1:0] UART_Mem_wt
 );
 

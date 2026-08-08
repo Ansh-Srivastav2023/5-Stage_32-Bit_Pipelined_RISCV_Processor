@@ -1,25 +1,34 @@
 ENTRY(_start)
 
 MEMORY {
-    RAM (rwx) : ORIGIN = 0x20000000, LENGTH = 4k
+    IMEM (rx)  : ORIGIN = 0x20000000, LENGTH = 4K 
+    
+    DMEM (rwx) : ORIGIN = 0x30000000, LENGTH = 4M
 }
 
 SECTIONS {
-    .init : {
-        KEEP(*(.init))
-    } > RAM
-
+    
     .text : {
+        *(.init)
         *(.text)
         *(.text.*)
-    } > RAM
+    } > IMEM
 
-    .data 0x20000800  : { 
-        _data_start = .;
-        *(.data*) 
+    .rodata : {
+        . = ALIGN(4);
         *(.rodata*)
+    } > IMEM
+
+
+    .data : { 
+        . = ALIGN(4);
+        _data_start = .;
+        *(.data) 
+        *(.data.*)
+        *(.sdata)
+        *(.sdata.*)
         _data_end = .;
-    } > RAM
+    } > DMEM
 
     .bss : {
         . = ALIGN(4);
@@ -27,12 +36,13 @@ SECTIONS {
         *(.bss)
         *(COMMON)
         _bss_end = .;
-    } > RAM
+    } > DMEM
 
     .stack (NOLOAD) : {
-        . = ALIGN(4);
+        . = ALIGN(16);
         _stack_bottom = .;
-        . = . + 512;
+        . = ORIGIN(DMEM) + LENGTH(DMEM);
         _stack_top = .;
-    } > RAM
+        PROVIDE(__global_pointer$ = ORIGIN(DMEM) + 0x800);
+    } > DMEM
 }

@@ -10,7 +10,7 @@ module PC(PC_next, clk, rst, PC, PCWrite);
 
     always @(posedge clk or negedge rst) begin
         if(~rst)
-            PC <= 32'h00000000;
+            PC <= 32'h20000000;
         else if (!PCWrite)
             PC <= PC;
         else
